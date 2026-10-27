@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/jpBg"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <include android:id="@+id/screen_home" layout="@layout/screen_home" />
+        <include android:id="@+id/screen_cal" layout="@layout/screen_calendar" />
+        <include android:id="@+id/screen_stats" layout="@layout/screen_stats" />
+        <include android:id="@+id/screen_profile" layout="@layout/screen_profile" />
+
+        <ImageView
+            android:id="@+id/fab"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/d_fab_ripple"
+            android:clickable="true"
+            android:contentDescription="Добавить подписку"
+            android:elevation="8dp"
+            android:focusable="true"
+            android:scaleType="center"
+            android:src="@drawable/ic_plus" />
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/jpLine" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                    android:src="@drawable/ic_nav_home" android:importantForAccessibility="no" />
+            </FrameLayout>
+            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="Главная" android:textColor="@color/nav_tint" android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_cal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                    android:src="@drawable/ic_nav_cal" android:importantForAccessibility="no" />
+            </FrameLayout>
+            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="Календарь" android:textColor="@color/nav_tint" android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_stats"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                    android:src="@drawable/ic_nav_stats" android:importantForAccessibility="no" />
+            </FrameLayout>
+            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="Аналитика" android:textColor="@color/nav_tint" android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_profile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                    android:src="@drawable/ic_nav_profile" android:importantForAccessibility="no" />
+            </FrameLayout>
+            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="Профиль" android:textColor="@color/nav_tint" android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

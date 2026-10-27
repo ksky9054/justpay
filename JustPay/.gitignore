@@ -1,0 +1,32 @@
+# Сборка и кэш Gradle (в любой вложенной папке)
+build/
+.gradle/
+.cxx/
+.externalNativeBuild/
+
+# Android Studio и другие IDE
+.idea/
+*.iml
+captures/
+.DS_Store
+Thumbs.db
+
+# Локальные настройки: в них путь к Android SDK на этом компьютере
+local.properties
+
+# Ключи подписи, пароли и токены (в репозиторий не попадают)
+*.jks
+*.keystore
+keystore.properties
+*.pem
+*.p12
+.env
+
+# Готовые сборки и логи
+*.apk
+*.aab
+*.ap_
+*.log
+
+# Служебные файлы ассистента разработки
+.claude/
