@@ -30,3 +30,6 @@ keystore.properties
 
 # Служебные файлы Claude Code
 .claude/
+
+# Генерируется средой и требует JDK 25; в README указан JDK 17 или 21
+gradle-daemon-jvm.properties

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/d_sheet"
+    android:orientation="vertical"
+    android:paddingTop="10dp">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/d_handle" />
+
+    <TextView
+        style="@style/Jp.Bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="Приложение сервиса"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/ap_sub"
+        style="@style/Jp.Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingMultiplier="1.15"
+        android:paddingStart="20dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="10dp"
+        android:textColor="?attr/jpTx2"
+        android:textSize="13sp" />
+
+    <ListView
+        android:id="@+id/ap_list"
+        android:layout_width="match_parent"
+        android:layout_height="360dp"
+        android:divider="@null"
+        android:overScrollMode="never"
+        android:scrollbars="none" />
+
+    <TextView
+        android:id="@+id/ap_cancel"
+        style="@style/Jp.Btn.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Отмена" />
+</LinearLayout>

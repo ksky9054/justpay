@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.JustPay.Dark" parent="Base.Theme.JustPay.Dark">
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+    <style name="Theme.JustPay.Light" parent="Base.Theme.JustPay.Light">
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

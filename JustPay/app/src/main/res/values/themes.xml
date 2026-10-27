@@ -1,0 +1,166 @@
+<resources>
+
+    <style name="Base.Theme.JustPay.Dark" parent="android:Theme.Material.NoActionBar">
+        <item name="jpBg">#0D0E11</item>
+        <item name="jpS1">#17181C</item>
+        <item name="jpS2">#222328</item>
+        <item name="jpLine">#12FFFFFF</item>
+        <item name="jpTx">#F3F3F1</item>
+        <item name="jpTx2">#A3F3F3F1</item>
+        <item name="jpTx3">#66F3F3F1</item>
+        <item name="jpIconDim">#696A69</item>
+        <item name="jpAct">#8B9BFF</item>
+        <item name="android:windowBackground">#0D0E11</item>
+        <item name="android:textColorPrimary">#F3F3F1</item>
+        <item name="android:textColorHint">#66F3F3F1</item>
+        <item name="android:colorAccent">@color/jp_ac</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Base.Theme.JustPay.Light" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="jpBg">#F2F2EF</item>
+        <item name="jpS1">#FFFFFF</item>
+        <item name="jpS2">#E7E7E3</item>
+        <item name="jpLine">#14111216</item>
+        <item name="jpTx">#111216</item>
+        <item name="jpTx2">#9E111216</item>
+        <item name="jpTx3">#6B111216</item>
+        <item name="jpIconDim">#939494</item>
+        <item name="jpAct">#4A55A8</item>
+        <item name="android:windowBackground">#F2F2EF</item>
+        <item name="android:textColorPrimary">#111216</item>
+        <item name="android:textColorHint">#6B111216</item>
+        <item name="android:colorAccent">#4A55A8</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Итоговые темы. На новых версиях Android дополняются в values-v27 и values-v29. -->
+    <style name="Theme.JustPay.Dark" parent="Base.Theme.JustPay.Dark" />
+    <style name="Theme.JustPay.Light" parent="Base.Theme.JustPay.Light" />
+
+    <!-- Базовый текст -->
+    <style name="Jp.Text" parent="">
+        <item name="android:textColor">?attr/jpTx</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/manrope_regular</item>
+    </style>
+    <style name="Jp.Semi" parent="Jp.Text">
+        <item name="android:fontFamily">@font/manrope_semibold</item>
+    </style>
+    <style name="Jp.Bold" parent="Jp.Text">
+        <item name="android:fontFamily">@font/manrope_bold</item>
+    </style>
+    <!-- Шрифт акцидентных цифр и заголовков (в дизайне Unbounded) -->
+    <style name="Jp.Disp" parent="Jp.Text">
+        <item name="android:fontFamily">@font/unbounded_medium</item>
+    </style>
+    <style name="Jp.Label" parent="Jp.Semi">
+        <item name="android:textColor">?attr/jpTx2</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="Jp.Caption" parent="Jp.Text">
+        <item name="android:textColor">?attr/jpTx3</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="Jp.Section" parent="Jp.Semi">
+        <item name="android:textColor">?attr/jpTx2</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">24dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+    <style name="Jp.ScreenTitle" parent="Jp.Disp">
+        <item name="android:textSize">24sp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">14dp</item>
+    </style>
+    <style name="Jp.Card" parent="">
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@drawable/d_card</item>
+    </style>
+
+    <!-- Кнопки (TextView: без стандартных отступов и тени Button) -->
+    <style name="Jp.Btn" parent="Jp.Bold">
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+    <style name="Jp.Btn.Primary">
+        <item name="android:background">@drawable/d_btn_primary</item>
+        <item name="android:textColor">@color/jp_ink</item>
+    </style>
+    <style name="Jp.Btn.Secondary">
+        <item name="android:background">@drawable/d_btn_secondary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:minHeight">54dp</item>
+    </style>
+    <style name="Jp.Btn.Outline">
+        <item name="android:background">@drawable/d_btn_outline</item>
+    </style>
+    <style name="Jp.Btn.Text" parent="Jp.Semi">
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">?attr/jpTx2</item>
+    </style>
+    <style name="Jp.CircleBtn" parent="Jp.Text">
+        <item name="android:background">@drawable/d_circle_btn</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="Jp.Seg" parent="Jp.Semi">
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/seg_text</item>
+        <item name="android:background">@drawable/d_seg_item</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="Jp.Chip" parent="Jp.Semi">
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/seg_text_chip</item>
+        <item name="android:background">@drawable/d_chip</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="Jp.Input" parent="Jp.Text">
+        <item name="android:background">@drawable/d_input</item>
+        <item name="android:minHeight">54dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="Jp.FieldError" parent="Jp.Semi">
+        <item name="android:textColor">@color/jp_err</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="Jp.SheetAnim" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+</resources>

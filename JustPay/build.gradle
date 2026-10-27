@@ -1,0 +1,4 @@
+// JustPay, корневой файл сборки. Сторонних библиотек в проекте нет.
+plugins {
+    id 'com.android.application' version '9.4.1' apply false
+}
