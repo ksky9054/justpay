@@ -101,11 +101,15 @@ final class StatsTab {
         if (idle.isEmpty()) return;
         unusedSub.setText("Они стоят " + Fmt.money(idleSum) + " в месяц. Если подписки не нужны, поставьте их на паузу.");
         LayoutInflater inflater = LayoutInflater.from(a);
-        for (Subscription s : idle) {
-            View row = inflater.inflate(R.layout.item_unused, unusedList, false);
+        for (int i = 0; i < idle.size(); i++) {
+            Subscription s = idle.get(i);
+            View row = inflater.inflate(R.layout.item_top_row, unusedList, false);
+            row.findViewById(R.id.divider).setVisibility(i == 0 ? View.GONE : View.VISIBLE);
+            row.findViewById(R.id.rank).setVisibility(View.GONE);
+            TextView since = row.findViewById(R.id.since);
+            since.setVisibility(View.VISIBLE);
+            since.setText("Подключена " + Fmt.dayFull(s.createdAt));
             ((TextView) row.findViewById(R.id.name)).setText(s.name);
-            ((TextView) row.findViewById(R.id.since)).setText(
-                    "Подключена " + Fmt.dayFull(s.createdAt));
             ((TextView) row.findViewById(R.id.price)).setText(Fmt.money(s.monthly()) + " / мес");
             row.findViewById(R.id.row).setOnClickListener(v -> a.openDetail(s.id));
             unusedList.addView(row);
