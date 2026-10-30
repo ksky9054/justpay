@@ -16,13 +16,14 @@
             android:layout_height="wrap_content"
             android:text="Профиль" />
 
+        <!-- Блок профиля -->
         <LinearLayout
+            style="@style/Jp.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="16dp">
@@ -78,6 +79,7 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Оформление -->
         <TextView
             style="@style/Jp.Section"
             android:layout_width="match_parent"
@@ -85,12 +87,11 @@
             android:text="Оформление" />
 
         <LinearLayout
+            style="@style/Jp.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
-            android:orientation="vertical"
             android:padding="16dp">
 
             <TextView
@@ -131,6 +132,7 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Напоминания -->
         <TextView
             style="@style/Jp.Section"
             android:layout_width="match_parent"
@@ -138,24 +140,19 @@
             android:text="Напоминания" />
 
         <LinearLayout
+            style="@style/Jp.Card.Divided"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
-            android:clipToOutline="true"
-            android:orientation="vertical">
+            android:layout_marginEnd="16dp">
 
             <LinearLayout
                 android:id="@+id/remind_row"
+                style="@style/Jp.Row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/d_row"
                 android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:focusable="true">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -250,18 +247,13 @@
                 android:textColor="@color/seg_text_s1"
                 android:textSize="13sp" />
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
-
             <LinearLayout
                 android:id="@+id/streak_row"
+                style="@style/Jp.Row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/d_row"
                 android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:focusable="true">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -298,18 +290,13 @@
                     android:track="@drawable/sw_track" />
             </LinearLayout>
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
-
             <LinearLayout
                 android:id="@+id/idle_row"
+                style="@style/Jp.Row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/d_row"
                 android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:focusable="true">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -347,6 +334,7 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Активность в приложениях -->
         <TextView
             style="@style/Jp.Section"
             android:layout_width="match_parent"
@@ -354,24 +342,19 @@
             android:text="Активность в приложениях" />
 
         <LinearLayout
+            style="@style/Jp.Card.Divided"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
-            android:clipToOutline="true"
-            android:orientation="vertical">
+            android:layout_marginEnd="16dp">
 
             <LinearLayout
                 android:id="@+id/usage_row"
+                style="@style/Jp.Row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/d_row"
                 android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:focusable="true">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -395,10 +378,13 @@
                         android:textSize="13sp" />
                 </LinearLayout>
 
-                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:layout_marginStart="12dp" android:importantForAccessibility="no" android:src="@drawable/ic_chevron_right" />
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
             </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
 
             <TextView
                 style="@style/Jp.Text"
@@ -411,6 +397,7 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
+        <!-- Оплата -->
         <TextView
             style="@style/Jp.Section"
             android:layout_width="match_parent"
@@ -418,30 +405,42 @@
             android:text="Оплата" />
 
         <LinearLayout
+            style="@style/Jp.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
-            android:orientation="vertical">
+            android:layout_marginEnd="16dp">
 
             <LinearLayout
                 android:id="@+id/currency_row"
+                style="@style/Jp.Row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/d_row"
                 android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:focusable="true">
 
-                <TextView style="@style/Jp.Semi" android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="Валюта" android:textSize="15sp" />
-                <TextView android:id="@+id/pf_currency" style="@style/Jp.Text" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:textColor="?attr/jpTx2" android:textSize="15sp" />
-                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:layout_marginStart="8dp"
-                    android:importantForAccessibility="no" android:src="@drawable/ic_chevron_right" />
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Валюта"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/pf_currency"
+                    style="@style/Jp.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/jpTx2"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
             </LinearLayout>
 
             <LinearLayout
@@ -462,6 +461,7 @@
                 android:text="Способы оплаты появятся здесь, когда вы укажете их в подписках. Номера карт вводить не нужно." />
         </LinearLayout>
 
+        <!-- О приложении -->
         <TextView
             style="@style/Jp.Section"
             android:layout_width="match_parent"
@@ -469,13 +469,11 @@
             android:text="О приложении" />
 
         <LinearLayout
+            style="@style/Jp.Card.Divided"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
-            android:clipToOutline="true"
-            android:orientation="vertical">
+            android:layout_marginEnd="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -483,15 +481,23 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Как считаются расходы" android:textSize="15sp" />
-                <TextView style="@style/Jp.Text" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp" android:lineSpacingMultiplier="1.15"
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Как считаются расходы"
+                    android:textSize="15sp" />
+
+                <TextView
+                    style="@style/Jp.Text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:lineSpacingMultiplier="1.15"
                     android:text="В сумму входят только активные подписки. Годовая цена делится на 12, недельная умножается на 52 и делится на 12. Приостановленные подписки считаются экономией."
-                    android:textColor="?attr/jpTx2" android:textSize="13sp" />
+                    android:textColor="?attr/jpTx2"
+                    android:textSize="13sp" />
             </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -499,15 +505,23 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Серия использования" android:textSize="15sp" />
-                <TextView style="@style/Jp.Text" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp" android:lineSpacingMultiplier="1.15"
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Серия использования"
+                    android:textSize="15sp" />
+
+                <TextView
+                    style="@style/Jp.Text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:lineSpacingMultiplier="1.15"
                     android:text="Звезда за каждый день, когда вы пользовались подпиской: данные приложения или ручная отметка. Серия — это дни подряд. Если сегодня отметки ещё нет, серия не прерывается до конца дня."
-                    android:textColor="?attr/jpTx2" android:textSize="13sp" />
+                    android:textColor="?attr/jpTx2"
+                    android:textSize="13sp" />
             </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -515,32 +529,50 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Ваши данные" android:textSize="15sp" />
-                <TextView style="@style/Jp.Text" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp" android:lineSpacingMultiplier="1.15"
-                    android:text="Аккаунт, подписки и статистика хранятся только на устройстве. JustPay не списывает деньги и не подключается к банкам: он лишь показывает, что и когда спишут сервисы."
-                    android:textColor="?attr/jpTx2" android:textSize="13sp" />
-            </LinearLayout>
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ваши данные"
+                    android:textSize="15sp" />
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
+                <TextView
+                    style="@style/Jp.Text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:lineSpacingMultiplier="1.15"
+                    android:text="Аккаунт, подписки и статистика хранятся только на устройстве. JustPay не списывает деньги и не подключается к банкам: он лишь показывает, что и когда спишут сервисы."
+                    android:textColor="?attr/jpTx2"
+                    android:textSize="13sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/row_onboarding"
+                style="@style/Jp.Row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/d_row"
                 android:clickable="true"
-                android:focusable="true"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:focusable="true">
 
-                <TextView style="@style/Jp.Semi" android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="Показать знакомство заново" android:textSize="15sp" />
-                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:layout_marginStart="12dp" android:importantForAccessibility="no" android:src="@drawable/ic_chevron_right" />
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Показать знакомство заново"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Аккаунт -->
         <TextView
             style="@style/Jp.Section"
             android:layout_width="match_parent"
@@ -548,13 +580,11 @@
             android:text="Аккаунт" />
 
         <LinearLayout
+            style="@style/Jp.Card.Divided"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
-            android:clipToOutline="true"
-            android:orientation="vertical">
+            android:layout_marginEnd="16dp">
 
             <TextView
                 android:id="@+id/row_logout"
@@ -567,8 +597,6 @@
                 android:padding="16dp"
                 android:text="Выйти из аккаунта"
                 android:textSize="15sp" />
-
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
 
             <TextView
                 android:id="@+id/row_delete"
@@ -584,6 +612,7 @@
                 android:textSize="15sp" />
         </LinearLayout>
 
+        <!-- Подвал -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -6,6 +6,7 @@
     android:background="?attr/jpBg"
     android:orientation="vertical">
 
+    <!-- Кнопка «Пропустить» -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="52dp"
@@ -50,41 +51,89 @@
                     android:layout_height="280dp"
                     android:layout_gravity="center">
 
-                    <View android:layout_width="280dp" android:layout_height="280dp" android:background="@drawable/d_ring" />
-                    <View android:layout_width="200dp" android:layout_height="200dp" android:layout_gravity="center" android:background="@drawable/d_ring" />
-                    <View android:layout_width="120dp" android:layout_height="120dp" android:layout_gravity="center" android:background="@drawable/d_oval_s1" />
-                    <View android:layout_width="10dp" android:layout_height="10dp" android:layout_gravity="top|end"
-                        android:layout_marginTop="30dp" android:layout_marginEnd="52dp"
-                        android:background="@drawable/d_dot" android:backgroundTint="?attr/jpTx3" />
-                    <View android:layout_width="7dp" android:layout_height="7dp" android:layout_gravity="bottom|start"
-                        android:layout_marginStart="22dp" android:layout_marginBottom="62dp"
-                        android:background="@drawable/d_dot" android:backgroundTint="?attr/jpTx3" />
-                    <ImageView android:layout_width="96dp" android:layout_height="96dp" android:layout_gravity="center"
-                        android:importantForAccessibility="no" android:src="@drawable/ic_logo_hero" />
+                    <View
+                        android:layout_width="280dp"
+                        android:layout_height="280dp"
+                        android:background="@drawable/d_ring" />
+
+                    <View
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/d_ring" />
+
+                    <View
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/d_oval_s1" />
+
+                    <View
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginEnd="52dp"
+                        android:background="@drawable/d_dot"
+                        android:backgroundTint="?attr/jpTx3" />
+
+                    <View
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:layout_gravity="bottom|start"
+                        android:layout_marginStart="22dp"
+                        android:layout_marginBottom="62dp"
+                        android:background="@drawable/d_dot"
+                        android:backgroundTint="?attr/jpTx3" />
+
+                    <ImageView
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_logo_hero" />
                 </FrameLayout>
 
                 <!-- Страница 2: сумма и ближайшие списания -->
                 <LinearLayout
                     android:id="@+id/ob_page1"
+                    style="@style/Jp.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/d_card"
-                    android:orientation="vertical"
                     android:padding="22dp"
                     android:visibility="gone">
 
-                    <TextView style="@style/Jp.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="В месяц" />
+                    <TextView
+                        style="@style/Jp.Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="В месяц" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:orientation="horizontal">
-                        <TextView android:id="@+id/ob_total" style="@style/Jp.Disp" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:letterSpacing="-0.03" android:maxLines="1" android:textSize="40sp" />
-                        <TextView style="@style/Jp.Disp" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:id="@+id/ob_cur" android:layout_marginStart="8dp" android:text="₽" android:textColor="?attr/jpTx3" android:textSize="24sp" />
+
+                        <TextView
+                            android:id="@+id/ob_total"
+                            style="@style/Jp.Disp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="-0.03"
+                            android:maxLines="1"
+                            android:textSize="40sp" />
+
+                        <TextView
+                            android:id="@+id/ob_cur"
+                            style="@style/Jp.Disp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="₽"
+                            android:textColor="?attr/jpTx3"
+                            android:textSize="24sp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -105,20 +154,43 @@
                     android:visibility="gone">
 
                     <LinearLayout
+                        style="@style/Jp.Card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/d_card"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">
-                        <TextView style="@style/Jp.Disp" android:layout_width="44dp" android:layout_height="44dp"
-                            android:background="@drawable/d_tile" android:gravity="center" android:text="Иви" android:textSize="12sp" />
-                        <TextView style="@style/Jp.Bold" android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_marginStart="14dp" android:layout_weight="1" android:text="Иви" android:textSize="16sp" />
-                        <TextView style="@style/Jp.Bold" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:background="@drawable/d_seg_bar_bg" android:paddingStart="10dp" android:paddingTop="6dp"
-                            android:paddingEnd="10dp" android:paddingBottom="6dp" android:text="На паузе"
-                            android:textColor="?attr/jpAct" android:textSize="12sp" />
+
+                        <TextView
+                            style="@style/Jp.Disp"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/d_tile"
+                            android:gravity="center"
+                            android:text="Иви"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            style="@style/Jp.Bold"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:text="Иви"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            style="@style/Jp.Bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/d_seg_bar_bg"
+                            android:paddingStart="10dp"
+                            android:paddingTop="6dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="6dp"
+                            android:text="На паузе"
+                            android:textColor="?attr/jpAct"
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -128,11 +200,26 @@
                         android:background="@drawable/d_next_card"
                         android:orientation="vertical"
                         android:padding="22dp">
-                        <TextView style="@style/Jp.Bold" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:alpha="0.72" android:text="Экономия за год" android:textColor="@color/jp_ink" android:textSize="13sp" />
-                        <TextView style="@style/Jp.Disp" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp" android:letterSpacing="-0.02" android:id="@+id/ob_saved" android:text="+4 788 ₽"
-                            android:textColor="@color/jp_ink" android:textSize="36sp" />
+
+                        <TextView
+                            style="@style/Jp.Bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.72"
+                            android:text="Экономия за год"
+                            android:textColor="@color/jp_ink"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/ob_saved"
+                            style="@style/Jp.Disp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:letterSpacing="-0.02"
+                            android:text="+4 788 ₽"
+                            android:textColor="@color/jp_ink"
+                            android:textSize="36sp" />
                     </LinearLayout>
                 </LinearLayout>
             </FrameLayout>
@@ -166,6 +253,7 @@
         </LinearLayout>
     </ScrollView>
 
+    <!-- Индикаторы точек и кнопка «Далее» -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

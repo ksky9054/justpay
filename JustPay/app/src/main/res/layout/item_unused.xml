@@ -5,23 +5,15 @@
     android:orientation="vertical">
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/jpLine" />
+        style="@style/Jp.DividerLine" />
 
     <LinearLayout
         android:id="@+id/row"
+        style="@style/Jp.Row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/d_row"
         android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingTop="14dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="14dp">
+        android:focusable="true">
 
         <LinearLayout
             android:layout_width="0dp"

@@ -53,23 +53,16 @@
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_bell" />
 
-                <FrameLayout
+                <View
                     android:id="@+id/bell_dot"
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
                     android:layout_gravity="top|end"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="9dp"
-                    android:background="@drawable/d_oval_s1"
-                    android:visibility="gone">
-
-                    <View
-                        android:layout_width="9dp"
-                        android:layout_height="9dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/d_dot"
-                        android:backgroundTint="@color/jp_ac" />
-                </FrameLayout>
+                    android:background="@drawable/d_dot"
+                    android:backgroundTint="@color/jp_ac"
+                    android:visibility="gone" />
             </FrameLayout>
         </LinearLayout>
 
@@ -106,11 +99,11 @@
                     android:textSize="48sp" />
 
                 <TextView
+                    android:id="@+id/total_cur"
                     style="@style/Jp.Disp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:id="@+id/total_cur"
                     android:text="₽"
                     android:textColor="?attr/jpTx3"
                     android:textSize="26sp" />
@@ -122,8 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:fontFamily="@font/manrope_regular"
-                android:text="" />
+                android:fontFamily="@font/manrope_regular" />
 
             <LinearLayout
                 android:id="@+id/saved_pill"
@@ -279,13 +271,11 @@
 
         <!-- Список подписок -->
         <LinearLayout
+            style="@style/Jp.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card"
-            android:clipToOutline="true"
-            android:orientation="vertical">
+            android:layout_marginEnd="16dp">
 
             <LinearLayout
                 android:id="@+id/list_rows"
