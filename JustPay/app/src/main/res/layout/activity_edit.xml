@@ -6,6 +6,7 @@
     android:background="?attr/jpBg"
     android:orientation="vertical">
 
+    <!-- Верхняя панель -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,13 +18,13 @@
         android:paddingBottom="8dp">
 
         <ImageView
-                android:id="@+id/btn_close"
-                style="@style/Jp.CircleBtn"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:contentDescription="Закрыть"
-                android:scaleType="center"
-                android:src="@drawable/ic_close" />
+            android:id="@+id/btn_close"
+            style="@style/Jp.CircleBtn"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="Закрыть"
+            android:scaleType="center"
+            android:src="@drawable/ic_close" />
 
         <TextView
             android:id="@+id/title"
@@ -48,6 +49,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Популярные сервисы для быстрого выбора -->
             <LinearLayout
                 android:id="@+id/quick_block"
                 android:layout_width="match_parent"
@@ -79,12 +81,13 @@
                 </HorizontalScrollView>
             </LinearLayout>
 
+            <!-- Основные поля формы -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingStart="16dp"
-                android:paddingTop="22dp"
+                android:paddingTop="20dp"
                 android:paddingEnd="16dp">
 
                 <!-- Название -->
@@ -115,12 +118,12 @@
 
                 <!-- Стоимость -->
                 <TextView
+                    android:id="@+id/label_price"
                     style="@style/Jp.Label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
                     android:paddingStart="4dp"
-                    android:id="@+id/label_price"
                     android:text="Стоимость" />
 
                 <EditText
@@ -346,6 +349,7 @@
                     android:text="Только название. Номер карты вводить не нужно." />
             </LinearLayout>
 
+            <!-- Предпросмотр расчёта -->
             <TextView
                 android:id="@+id/preview"
                 style="@style/Jp.Text"
@@ -360,6 +364,7 @@
                 android:textColor="?attr/jpTx2"
                 android:textSize="14sp" />
 
+            <!-- Кнопка сохранения -->
             <TextView
                 android:id="@+id/btn_save"
                 style="@style/Jp.Btn.Primary"

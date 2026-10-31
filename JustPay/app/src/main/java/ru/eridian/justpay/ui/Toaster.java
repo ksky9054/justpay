@@ -1,8 +1,8 @@
 package ru.eridian.justpay.ui;
 
 import android.app.Activity;
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import ru.eridian.justpay.R;
@@ -32,8 +32,24 @@ public final class Toaster {
         Object old = content.getTag(TAG);
         if (old instanceof TextView) content.removeView((TextView) old);
 
-        TextView t = (TextView) LayoutInflater.from(a).inflate(R.layout.view_toast, content, false);
+        TextView t = new TextView(a);
+        t.setTextAppearance(R.style.Jp_Semi);
         t.setText(message);
+        t.setTextSize(14f);
+        t.setTextColor(Ui.attr(a, R.attr.jpBg));
+        t.setBackgroundResource(R.drawable.d_toast);
+        t.setElevation(Ui.dp(a, 12));
+        int ph = Ui.dp(a, 18);
+        int pv = Ui.dp(a, 14);
+        t.setPadding(ph, pv, ph, pv);
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.gravity = android.view.Gravity.BOTTOM;
+        int m = Ui.dp(a, 16);
+        lp.setMargins(m, 0, m, Ui.dp(a, 84));
+        t.setLayoutParams(lp);
+
         t.setAlpha(0f);
         t.setTranslationY(Ui.dp(a, 12));
         content.addView(t);

@@ -8,6 +8,7 @@
     android:padding="18dp">
 
     <TextView
+        android:id="@+id/b_title"
         style="@style/Jp.Label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,7 +27,6 @@
             android:layout_height="wrap_content"
             android:letterSpacing="-0.02"
             android:maxLines="1"
-            android:textColor="?attr/jpAct"
             android:textSize="34sp" />
 
         <TextView
@@ -45,19 +45,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textSize="15sp" />
+        android:textSize="15sp"
+        android:visibility="gone" />
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:background="?attr/jpLine" />
+        style="@style/Jp.DividerLine"
+        android:layout_marginTop="16dp" />
 
     <LinearLayout
+        android:id="@+id/b_row_change"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <TextView
             style="@style/Jp.Text"
@@ -88,6 +89,31 @@
 
         <TextView
             android:id="@+id/b_after"
+            style="@style/Jp.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/b_row_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/Jp.Text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Первое списание"
+            android:textColor="?attr/jpTx2"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/b_date"
             style="@style/Jp.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

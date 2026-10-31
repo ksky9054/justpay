@@ -83,6 +83,25 @@
     <style name="Jp.Card" parent="">
         <item name="android:orientation">vertical</item>
         <item name="android:background">@drawable/d_card</item>
+        <item name="android:clipToOutline">true</item>
+    </style>
+    <style name="Jp.Card.Divided" parent="Jp.Card">
+        <item name="android:divider">@drawable/d_divider</item>
+        <item name="android:showDividers">middle</item>
+    </style>
+    <style name="Jp.Row" parent="">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:background">@drawable/d_row</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+    </style>
+    <style name="Jp.DividerLine" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/jpLine</item>
     </style>
 
     <!-- Кнопки (TextView: без стандартных отступов и тени Button) -->

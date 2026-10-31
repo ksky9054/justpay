@@ -6,24 +6,16 @@
 
     <View
         android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/jpLine"
+        style="@style/Jp.DividerLine"
         android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/row"
+        style="@style/Jp.Row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/d_row"
         android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingTop="14dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="14dp">
+        android:focusable="true">
 
         <TextView
             android:id="@+id/mk"
@@ -71,18 +63,27 @@
 
             <TextView
                 android:id="@+id/price"
-                style="@style/Jp.Bold"
+                style="@style/Jp.Disp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:textSize="15sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/cyc"
-                style="@style/Jp.Caption"
+                style="@style/Jp.Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp" />
+                android:layout_marginTop="3dp"
+                android:textColor="?attr/jpTx2"
+                android:textSize="12sp" />
         </LinearLayout>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="10dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_chevron_right_tx" />
     </LinearLayout>
 </LinearLayout>

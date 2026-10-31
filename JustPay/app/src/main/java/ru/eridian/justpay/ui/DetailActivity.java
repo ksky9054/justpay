@@ -155,9 +155,16 @@ public class DetailActivity extends BaseActivity {
         double total = totalMonthly();
 
         if (s.isActive()) {
-            ConfirmSheet.show(this, "Приостановить «" + s.name + "»?", R.layout.sheet_body_pause, body -> {
-                ((TextView) body.findViewById(R.id.b_month)).setText(Fmt.money(month));
-                ((TextView) body.findViewById(R.id.b_year)).setText(Fmt.money(month * 12) + " за год");
+            ConfirmSheet.show(this, "Приостановить «" + s.name + "»?", R.layout.sheet_body_confirm, body -> {
+                ((TextView) body.findViewById(R.id.b_title)).setText("Вы сэкономите");
+                TextView monthTv = body.findViewById(R.id.b_month);
+                monthTv.setText(Fmt.money(month));
+                monthTv.setTextColor(Ui.attr(this, R.attr.jpAct));
+                TextView yearTv = body.findViewById(R.id.b_year);
+                yearTv.setVisibility(View.VISIBLE);
+                yearTv.setText(Fmt.money(month * 12) + " за год");
+                body.findViewById(R.id.b_row_change).setVisibility(View.VISIBLE);
+                body.findViewById(R.id.b_row_date).setVisibility(View.GONE);
                 TextView before = body.findViewById(R.id.b_before);
                 before.setText(Fmt.money(total));
                 before.setPaintFlags(before.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
@@ -174,8 +181,14 @@ public class DetailActivity extends BaseActivity {
         } else {
             LocalDate base = s.prev != null ? s.prev : today();
             LocalDate resume = Subscription.advance(base, s.cycle, today(), false);
-            ConfirmSheet.show(this, "Возобновить «" + s.name + "»?", R.layout.sheet_body_resume, body -> {
-                ((TextView) body.findViewById(R.id.b_month)).setText("+" + Fmt.money(month));
+            ConfirmSheet.show(this, "Возобновить «" + s.name + "»?", R.layout.sheet_body_confirm, body -> {
+                ((TextView) body.findViewById(R.id.b_title)).setText("Добавится к расходам");
+                TextView monthTv = body.findViewById(R.id.b_month);
+                monthTv.setText("+" + Fmt.money(month));
+                monthTv.setTextColor(Ui.attr(this, R.attr.jpTx));
+                body.findViewById(R.id.b_year).setVisibility(View.GONE);
+                body.findViewById(R.id.b_row_change).setVisibility(View.GONE);
+                body.findViewById(R.id.b_row_date).setVisibility(View.VISIBLE);
                 ((TextView) body.findViewById(R.id.b_date)).setText(Fmt.dayLong(resume));
             }, null, "Возобновить", false, () -> {
                 s.status = Subscription.ACTIVE;

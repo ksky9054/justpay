@@ -139,12 +139,14 @@ final class CalendarTab {
         if (items != null) {
             for (int i = 0; i < items.size(); i++) {
                 Subscription s = items.get(i);
-                View row = inflater.inflate(R.layout.item_cal_row, list, false);
+                View row = inflater.inflate(R.layout.item_sub_row, list, false);
                 row.findViewById(R.id.divider).setVisibility(i == 0 ? View.GONE : View.VISIBLE);
                 ((TextView) row.findViewById(R.id.mk)).setText(s.mark);
                 ((TextView) row.findViewById(R.id.name)).setText(s.name);
                 ((TextView) row.findViewById(R.id.price)).setText(Fmt.price(s.price));
-                ((TextView) row.findViewById(R.id.status)).setText(
+                View cyc = row.findViewById(R.id.cyc);
+                if (cyc != null) cyc.setVisibility(View.GONE);
+                ((TextView) row.findViewById(R.id.line)).setText(
                         (past ? "Списано" : "Запланировано") + (s.hasCard() ? " · " + s.card : ""));
                 row.findViewById(R.id.row).setOnClickListener(v -> a.openDetail(s.id));
                 list.addView(row);
