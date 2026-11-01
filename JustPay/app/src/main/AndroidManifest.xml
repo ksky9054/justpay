@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Приложение работает офлайн, данные лежат в SQLite на устройстве. Разрешения нужны только
+         для напоминаний и учёта активности: показать уведомление, заново завести будильник
+         после перезагрузки и прочитать статистику использования приложений, которые пользователь
+         сам привязал к подпискам. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Сеть нужна только для курса валют при смене валюты аккаунта (Банк России). Без неё
+         всё остальное работает. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Особый доступ: пользователь включает его вручную в настройках Android -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- Видеть приложения с значком запуска, чтобы пользователь мог выбрать приложение сервиса
+         (без широкого разрешения QUERY_ALL_PACKAGES) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.JustPay.Dark">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.AuthActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.OnboardingActivity" android:exported="false" />
+        <activity android:name=".ui.DetailActivity" android:exported="false" />
+        <activity
+            android:name=".ui.EditActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.NotificationsActivity" android:exported="false" />
+
+        <!-- Будильник напоминания: приходит только от самого приложения -->
+        <receiver android:name=".reminder.ReminderReceiver" android:exported="false" />
+        <!-- Системные события, после которых будильник заводится заново -->
+        <receiver android:name=".reminder.SystemEventsReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

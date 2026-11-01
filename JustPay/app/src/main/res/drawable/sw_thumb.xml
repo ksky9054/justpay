@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <inset android:inset="3dp">
+            <shape android:shape="oval"><size android:width="22dp" android:height="22dp" /><solid android:color="@color/jp_ink" /></shape>
+        </inset>
+    </item>
+    <item>
+        <inset android:inset="3dp">
+            <shape android:shape="oval"><size android:width="22dp" android:height="22dp" /><solid android:color="?attr/jpTx2" /></shape>
+        </inset>
+    </item>
+</selector>
