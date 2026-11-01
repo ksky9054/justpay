@@ -3,12 +3,12 @@ package ru.eridian.justpay.ui;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.os.SystemClock;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Patterns;
@@ -30,15 +30,13 @@ import ru.eridian.justpay.data.AccountRepository;
 public class AuthActivity extends BaseActivity {
     private static final int MAX_FAILS = 5;
     private static final long LOCK_MS = 30_000;
-    // Защита от перебора пароля: считаем неудачные входы
-    private static int fails = 0;
-    private static long lockedUntil = 0;
 
     private static final ExecutorService WORKER = Executors.newSingleThreadExecutor();
 
     private boolean register = false;
     private boolean passwordShown = false;
     private boolean busy = false;
+    private CountDownTimer lockTimer; // отсчёт до следующей попытки входа
 
     private View blockName, blockPass2, blockConsent;
     private CheckBox cbTerms, cbPrivacy, cbConsent;
@@ -137,6 +135,47 @@ public class AuthActivity extends BaseActivity {
         submit.setText(reg ? "Создать аккаунт" : "Войти");
         aPass.setImeOptions(reg ? EditorInfo.IME_ACTION_NEXT : EditorInfo.IME_ACTION_DONE);
         clearErrors();
+        startLockTimer();
+    }
+
+    // Пока вход закрыт, показываем сколько секунд осталось и не даём нажать кнопку
+    private void startLockTimer() {
+        stopLockTimer();
+        long wait = prefs.lockedUntil() - System.currentTimeMillis();
+        if (register || wait <= 0) return;
+        submit.setEnabled(false);
+        submit.setAlpha(0.6f);
+        lockTimer = new CountDownTimer(wait, 1000) {
+            @Override
+            public void onTick(long left) {
+                long seconds = (left + 999) / 1000;
+                authError.setText("Много попыток. Следующая через " + seconds + " с");
+                authError.setVisibility(View.VISIBLE);
+                submit.setText("Войти через " + seconds + " с");
+            }
+
+            @Override
+            public void onFinish() {
+                stopLockTimer();
+                authError.setVisibility(View.GONE);
+                submit.setText("Войти");
+            }
+        }.start();
+    }
+
+    private void stopLockTimer() {
+        if (lockTimer != null) {
+            lockTimer.cancel();
+            lockTimer = null;
+        }
+        submit.setEnabled(true);
+        submit.setAlpha(1f);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (lockTimer != null) lockTimer.cancel();
+        super.onDestroy();
     }
 
     // Название документа в тексте флажка это ссылка, остальной текст ставит или снимает отметку
@@ -220,7 +259,7 @@ public class AuthActivity extends BaseActivity {
         }
         if (!ok) return;
 
-        long wait = lockedUntil - SystemClock.elapsedRealtime();
+        long wait = prefs.lockedUntil() - System.currentTimeMillis();
         if (!register && wait > 0) {
             authError.setText("Много попыток. Подождите " + ((wait + 999) / 1000) + " с.");
             authError.setVisibility(View.VISIBLE);
@@ -249,20 +288,24 @@ public class AuthActivity extends BaseActivity {
                 if (isFinishing() || isDestroyed()) return;
                 setBusy(false);
                 if (result != null) {
-                    fails = 0;
+                    prefs.setLoginFails(0);
                     prefs.setAccountId(result.id);
                     openMain();
                     return;
                 }
                 if (!register) {
-                    fails++;
+                    // Ошибки считаем в настройках, чтобы перезапуск приложения не снимал блокировку
+                    int fails = prefs.loginFails() + 1;
                     if (fails >= MAX_FAILS) {
-                        fails = 0;
-                        lockedUntil = SystemClock.elapsedRealtime() + LOCK_MS;
+                        prefs.setLoginFails(0);
+                        prefs.setLockedUntil(System.currentTimeMillis() + LOCK_MS);
+                    } else {
+                        prefs.setLoginFails(fails);
                     }
                 }
                 authError.setText(message);
                 authError.setVisibility(View.VISIBLE);
+                startLockTimer();
             });
         });
     }

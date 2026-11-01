@@ -130,7 +130,6 @@
     <style name="Jp.Card" parent="">
         <item name="android:orientation">vertical</item>
         <item name="android:background">@drawable/d_card</item>
-        <item name="android:clipToOutline">true</item>
     </style>
     <style name="Jp.Card.Divided" parent="Jp.Card">
         <item name="android:divider">@drawable/d_divider</item>

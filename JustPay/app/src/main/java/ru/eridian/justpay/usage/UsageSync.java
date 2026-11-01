@@ -46,10 +46,16 @@ public final class UsageSync {
         });
     }
 
+    /** Сколько раз открывали приложение и сколько секунд оно было на экране за один день */
+    static final class DayCount {
+        int opens;
+        int seconds;
+    }
+
     static final class Counter {
         long fgSince = -1;
         long lastPause = -1;
-        final Map<LocalDate, int[]> perDay = new HashMap<>(); // день -> {открытия, секунды}
+        final Map<LocalDate, DayCount> perDay = new HashMap<>();
     }
 
     public static void sync(Context context) {
@@ -90,8 +96,9 @@ public final class UsageSync {
         for (Subscription s : linked) {
             Counter c = counters.get(s.appPackage);
             if (c == null) continue;
-            for (Map.Entry<LocalDate, int[]> d : c.perDay.entrySet()) {
-                int opens = d.getValue()[0], seconds = d.getValue()[1];
+            for (Map.Entry<LocalDate, DayCount> d : c.perDay.entrySet()) {
+                int opens = d.getValue().opens;
+                int seconds = d.getValue().seconds;
                 // Нулевые дни не пишем: старые события могли удалиться, пустой ответ не должен затирать накопленное
                 if (opens > 0 || seconds > 0) usage.saveAuto(s.id, d.getKey(), opens, seconds);
             }
@@ -103,12 +110,12 @@ public final class UsageSync {
         if (type == EVENT_FOREGROUND) {
             if (c.fgSince < 0) {
                 boolean newLaunch = c.lastPause < 0 || ts - c.lastPause > SAME_LAUNCH_GAP_MS;
-                if (newLaunch) bucket(c, ts, zone)[0]++;
+                if (newLaunch) bucket(c, ts, zone).opens++;
                 c.fgSince = ts;
             }
         } else if (type == EVENT_BACKGROUND) {
             if (c.fgSince >= 0) {
-                bucket(c, c.fgSince, zone)[1] += (int) ((ts - c.fgSince) / 1000);
+                bucket(c, c.fgSince, zone).seconds += (int) ((ts - c.fgSince) / 1000);
                 c.fgSince = -1;
                 c.lastPause = ts;
             }
@@ -118,18 +125,19 @@ public final class UsageSync {
     static void finish(Counter c, long end, ZoneId zone) {
         // Приложение всё ещё на экране
         if (c.fgSince >= 0) {
-            bucket(c, c.fgSince, zone)[1] += (int) ((end - c.fgSince) / 1000);
+            bucket(c, c.fgSince, zone).seconds += (int) ((end - c.fgSince) / 1000);
             c.fgSince = -1;
         }
     }
 
-    private static int[] bucket(Counter c, long ts, ZoneId zone) {
+    // Запись за нужный день, если её ещё нет, создаём
+    private static DayCount bucket(Counter c, long ts, ZoneId zone) {
         LocalDate day = Instant.ofEpochMilli(ts).atZone(zone).toLocalDate();
-        int[] v = c.perDay.get(day);
-        if (v == null) {
-            v = new int[2];
-            c.perDay.put(day, v);
+        DayCount count = c.perDay.get(day);
+        if (count == null) {
+            count = new DayCount();
+            c.perDay.put(day, count);
         }
-        return v;
+        return count;
     }
 }

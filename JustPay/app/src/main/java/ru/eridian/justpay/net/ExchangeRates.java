@@ -142,6 +142,7 @@ public final class ExchangeRates {
 
     /** Множитель из валюты from в to */
     public double factor(Currency from, Currency to) {
+        if (!supports(from, to)) throw new IllegalArgumentException("Нет курса для " + from + " или " + to);
         return rubPerUnit.get(from.name()) / rubPerUnit.get(to.name());
     }
 

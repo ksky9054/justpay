@@ -13,6 +13,8 @@ public final class Prefs {
     private static final String K_DARK = "dark";
     private static final String K_ACCENT = "accent";
     private static final String K_ACCOUNT = "account_id";
+    private static final String K_LOGIN_FAILS = "login_fails";
+    private static final String K_LOCKED_UNTIL = "locked_until";
     private static final String K_PERM_ASKED = "notif_permission_asked";
 
     // Ключи, к которым добавляется номер аккаунта
@@ -45,6 +47,12 @@ public final class Prefs {
     /** Номер цвета акцента */
     public int accent() { return sp.getInt(K_ACCENT, 0); }
     public void setAccent(int index) { sp.edit().putInt(K_ACCENT, index).apply(); }
+
+    // Защита от перебора пароля: сколько раз ошиблись и до какого времени вход закрыт
+    public int loginFails() { return sp.getInt(K_LOGIN_FAILS, 0); }
+    public void setLoginFails(int n) { sp.edit().putInt(K_LOGIN_FAILS, n).apply(); }
+    public long lockedUntil() { return sp.getLong(K_LOCKED_UNTIL, 0); }
+    public void setLockedUntil(long time) { sp.edit().putLong(K_LOCKED_UNTIL, time).apply(); }
 
     /** Спрашивали ли разрешение на уведомления */
     public boolean notifPermissionAsked() { return sp.getBoolean(K_PERM_ASKED, false); }

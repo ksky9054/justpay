@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- С Android 12 карточка обрезает содержимое по своим скруглённым углам -->
+    <style name="Jp.Card" parent="">
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@drawable/d_card</item>
+        <item name="android:clipToOutline">true</item>
+    </style>
+</resources>

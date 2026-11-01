@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Set;
 
 import ru.eridian.justpay.R;
+import ru.eridian.justpay.data.Account;
+import ru.eridian.justpay.data.AccountRepository;
 import ru.eridian.justpay.data.Prefs;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.data.SubscriptionRepository;
@@ -81,7 +83,7 @@ public final class ReminderScheduler {
     static void notifyDue(Context app) {
         Prefs prefs = new Prefs(app);
         // Экранов нет, валюту ставим сами
-        ru.eridian.justpay.data.Account acc = ru.eridian.justpay.data.AccountRepository.get(app).find(prefs.accountId());
+        Account acc = AccountRepository.get(app).find(prefs.accountId());
         Fmt.setCurrency(acc == null ? null : acc.currencyValue());
         Set<String> done = prefs.notified();
         LocalDate today = LocalDate.now();

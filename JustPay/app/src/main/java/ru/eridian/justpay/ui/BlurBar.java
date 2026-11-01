@@ -3,6 +3,7 @@ package ru.eridian.justpay.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -58,7 +59,7 @@ public class BlurBar extends LinearLayout {
             // Размываем её и растягиваем на всю панель, сверху лёгкая дымка цвета фона
             blur();
             canvas.drawBitmap(small, null, new Rect(0, 0, getWidth(), getHeight()), paint);
-            canvas.drawColor((bg & 0x00FFFFFF) | 0x99000000);
+            canvas.drawColor(Color.argb(153, Color.red(bg), Color.green(bg), Color.blue(bg)));
         }
         super.dispatchDraw(canvas);
     }
@@ -85,13 +86,13 @@ public class BlurBar extends LinearLayout {
                     int ny = horizontal ? y : y + k;
                     if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
                     int color = from[ny * w + nx];
-                    a += color >>> 24;
-                    r += (color >> 16) & 0xFF;
-                    g += (color >> 8) & 0xFF;
-                    b += color & 0xFF;
+                    a += Color.alpha(color);
+                    r += Color.red(color);
+                    g += Color.green(color);
+                    b += Color.blue(color);
                     count++;
                 }
-                to[y * w + x] = ((a / count) << 24) | ((r / count) << 16) | ((g / count) << 8) | (b / count);
+                to[y * w + x] = Color.argb(a / count, r / count, g / count, b / count);
             }
         }
     }

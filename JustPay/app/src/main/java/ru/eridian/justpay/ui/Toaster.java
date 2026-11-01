@@ -12,7 +12,7 @@ public final class Toaster {
     private Toaster() {}
 
     private static String pending;
-    private static final int TAG = R.id.root;
+    private static final int TAG = R.id.toast_tag;
 
     /** Запоминает сообщение для следующего экрана */
     public static void post(String message) {

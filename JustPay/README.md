@@ -25,7 +25,7 @@ JustPay собирает подписки в одном месте: показы
 ## Технологии
 
 Java 17 (язык исходников), XML и Android Views, SQLite через `SQLiteOpenHelper`, `SharedPreferences`.
-Kotlin, Compose, WebView и сторонние библиотеки не используются. Зависимостей в `build.gradle` нет.
+Kotlin, Compose, WebView и сторонние библиотеки не используются. В приложении зависимостей нет, для автотестов подключён только JUnit (`gradlew.bat test`).
 
 ## Версии для сборки
 
