@@ -55,34 +55,34 @@
         <item name="jpAcTextLight">#4A55A8</item>
     </style>
     <style name="Jp.Accent.Violet" parent="">
-        <item name="jpAcFill">#8D69F9</item>
-        <item name="jpAcTextDark">#8D69F9</item>
-        <item name="jpAcTextLight">#715EA9</item>
+        <item name="jpAcFill">#CDBDFF</item>
+        <item name="jpAcTextDark">#CDBDFF</item>
+        <item name="jpAcTextLight">#63568F</item>
     </style>
     <style name="Jp.Accent.Sky" parent="">
-        <item name="jpAcFill">#48B6FF</item>
-        <item name="jpAcTextDark">#48B6FF</item>
-        <item name="jpAcTextLight">#3C6D8E</item>
+        <item name="jpAcFill">#98CCF9</item>
+        <item name="jpAcTextDark">#98CCF9</item>
+        <item name="jpAcTextLight">#2A638A</item>
     </style>
     <style name="Jp.Accent.Mint" parent="">
-        <item name="jpAcFill">#40DAA1</item>
-        <item name="jpAcTextDark">#40DAA1</item>
-        <item name="jpAcTextLight">#30745B</item>
+        <item name="jpAcFill">#8DD5B2</item>
+        <item name="jpAcTextDark">#8DD5B2</item>
+        <item name="jpAcTextLight">#206A4E</item>
     </style>
     <style name="Jp.Accent.Lime" parent="">
-        <item name="jpAcFill">#B7E14C</item>
-        <item name="jpAcTextDark">#B7E14C</item>
-        <item name="jpAcTextLight">#5D6E33</item>
+        <item name="jpAcFill">#B9CF83</item>
+        <item name="jpAcTextDark">#B9CF83</item>
+        <item name="jpAcTextLight">#536525</item>
     </style>
     <style name="Jp.Accent.Amber" parent="">
-        <item name="jpAcFill">#EFA64A</item>
-        <item name="jpAcTextDark">#EFA64A</item>
-        <item name="jpAcTextLight">#826239</item>
+        <item name="jpAcFill">#F9BB72</item>
+        <item name="jpAcTextDark">#F9BB72</item>
+        <item name="jpAcTextLight">#835414</item>
     </style>
     <style name="Jp.Accent.Rose" parent="">
-        <item name="jpAcFill">#EE7BB4</item>
-        <item name="jpAcTextDark">#EE7BB4</item>
-        <item name="jpAcTextLight">#8C5972</item>
+        <item name="jpAcFill">#FEB0D2</item>
+        <item name="jpAcTextDark">#FEB0D2</item>
+        <item name="jpAcTextLight">#894A68</item>
     </style>
 
     <!-- Итоговые темы, на новых Android дополняются в values-v27 и v29 -->
