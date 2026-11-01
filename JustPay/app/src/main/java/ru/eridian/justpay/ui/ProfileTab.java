@@ -99,6 +99,9 @@ final class ProfileTab {
 
         screen.findViewById(R.id.usage_row).setOnClickListener(v ->
                 a.startActivity(UsageAccess.settingsIntent(a)));
+        screen.findViewById(R.id.row_doc_terms).setOnClickListener(v -> LegalActivity.open(a, LegalActivity.TERMS));
+        screen.findViewById(R.id.row_doc_privacy).setOnClickListener(v -> LegalActivity.open(a, LegalActivity.PRIVACY));
+        screen.findViewById(R.id.row_doc_consent).setOnClickListener(v -> LegalActivity.open(a, LegalActivity.CONSENT));
         screen.findViewById(R.id.row_onboarding).setOnClickListener(v ->
                 a.startActivity(new Intent(a, OnboardingActivity.class)
                         .putExtra(OnboardingActivity.EXTRA_REPLAY, true)));

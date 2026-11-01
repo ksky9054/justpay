@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /** База данных: аккаунты, подписки и статистика использования */
 public class JustPayDbHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "justpay.db";
-    public static final int DB_VERSION = 4;
+    public static final int DB_VERSION = 5;
 
     // accounts
     public static final String T_ACCOUNTS = "accounts";
@@ -20,6 +20,7 @@ public class JustPayDbHelper extends SQLiteOpenHelper {
     public static final String A_CREATED = "created_at";
     public static final String A_AVATAR = "avatar";
     public static final String A_CURRENCY = "currency";
+    public static final String A_CONSENT = "consent_date";
 
     // subscriptions
     public static final String TABLE = "subscriptions";
@@ -80,6 +81,10 @@ public class JustPayDbHelper extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + T_ACCOUNTS + " ADD COLUMN " + A_CURRENCY
                     + " TEXT NOT NULL DEFAULT 'RUB'");
         }
+        if (oldVersion >= 3 && oldVersion < 5) {
+            // Версия 5: дата согласия на обработку данных, у старых аккаунтов пустая
+            db.execSQL("ALTER TABLE " + T_ACCOUNTS + " ADD COLUMN " + A_CONSENT + " TEXT NOT NULL DEFAULT ''");
+        }
     }
 
     private static void createAccounts(SQLiteDatabase db) {
@@ -92,7 +97,8 @@ public class JustPayDbHelper extends SQLiteOpenHelper {
                 + A_ITER + " INTEGER NOT NULL, "
                 + A_CREATED + " TEXT NOT NULL, "
                 + A_AVATAR + " TEXT NOT NULL DEFAULT 'initials:0', "
-                + A_CURRENCY + " TEXT NOT NULL DEFAULT 'RUB')");
+                + A_CURRENCY + " TEXT NOT NULL DEFAULT 'RUB', "
+                + A_CONSENT + " TEXT NOT NULL DEFAULT '')");
     }
 
     private static void createSubscriptions(SQLiteDatabase db) {

@@ -1,12 +1,20 @@
 package ru.eridian.justpay.ui;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.os.SystemClock;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,9 +40,10 @@ public class AuthActivity extends BaseActivity {
     private boolean passwordShown = false;
     private boolean busy = false;
 
-    private View blockName, blockPass2;
+    private View blockName, blockPass2, blockConsent;
+    private CheckBox cbTerms, cbPrivacy, cbConsent;
     private EditText aName, aEmail, aPass, aPass2;
-    private TextView errName, errEmail, errPass, errPass2, authError, submit, title, subtitle;
+    private TextView errName, errEmail, errPass, errPass2, errConsent, authError, submit, title, subtitle;
     private TextView tabLogin, tabRegister, btnShow;
 
     @Override
@@ -64,6 +73,19 @@ public class AuthActivity extends BaseActivity {
         tabLogin = findViewById(R.id.tab_login);
         tabRegister = findViewById(R.id.tab_register);
         btnShow = findViewById(R.id.btn_show);
+        blockConsent = findViewById(R.id.block_consent);
+        cbTerms = findViewById(R.id.cb_terms);
+        cbPrivacy = findViewById(R.id.cb_privacy);
+        cbConsent = findViewById(R.id.cb_consent);
+        errConsent = findViewById(R.id.err_consent);
+        setConsentText(cbTerms, "Принимаю ", "пользовательское соглашение", LegalActivity.TERMS);
+        setConsentText(cbPrivacy, "Ознакомился с ", "политикой обработки персональных данных", LegalActivity.PRIVACY);
+        setConsentText(cbConsent, "Даю ", "согласие на обработку персональных данных", LegalActivity.CONSENT);
+        // Ошибка про отметки пропадает, как только пользователь что-то отметил
+        CompoundButton.OnCheckedChangeListener hideError = (button, checked) -> errConsent.setVisibility(View.GONE);
+        cbTerms.setOnCheckedChangeListener(hideError);
+        cbPrivacy.setOnCheckedChangeListener(hideError);
+        cbConsent.setOnCheckedChangeListener(hideError);
 
         if (savedInstanceState != null) register = savedInstanceState.getBoolean("register", false);
 
@@ -107,6 +129,7 @@ public class AuthActivity extends BaseActivity {
         tabRegister.setSelected(reg);
         blockName.setVisibility(reg ? View.VISIBLE : View.GONE);
         blockPass2.setVisibility(reg ? View.VISIBLE : View.GONE);
+        blockConsent.setVisibility(reg ? View.VISIBLE : View.GONE);
         title.setText(reg ? "Создайте аккаунт" : "С возвращением");
         subtitle.setText(reg
                 ? "Новый аккаунт пуст."
@@ -114,6 +137,26 @@ public class AuthActivity extends BaseActivity {
         submit.setText(reg ? "Создать аккаунт" : "Войти");
         aPass.setImeOptions(reg ? EditorInfo.IME_ACTION_NEXT : EditorInfo.IME_ACTION_DONE);
         clearErrors();
+    }
+
+    // Название документа в тексте флажка это ссылка, остальной текст ставит или снимает отметку
+    private void setConsentText(CheckBox box, String before, String link, int doc) {
+        SpannableString text = new SpannableString(before + link);
+        text.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(View v) {
+                LegalActivity.open(AuthActivity.this, doc);
+            }
+
+            @Override
+            public void updateDrawState(TextPaint paint) {
+                paint.setColor(Ui.attr(AuthActivity.this, R.attr.jpAct));
+                paint.setUnderlineText(true);
+            }
+        }, before.length(), text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        box.setText(text);
+        box.setMovementMethod(LinkMovementMethod.getInstance());
+        box.setHighlightColor(Color.TRANSPARENT);
     }
 
     private void togglePassword() {
@@ -131,6 +174,7 @@ public class AuthActivity extends BaseActivity {
         show(aEmail, errEmail, null);
         show(aPass, errPass, null);
         show(aPass2, errPass2, null);
+        errConsent.setVisibility(View.GONE);
         authError.setVisibility(View.GONE);
     }
 
@@ -167,6 +211,11 @@ public class AuthActivity extends BaseActivity {
         }
         if (register && ok && !pass.equals(pass2)) {
             show(aPass2, errPass2, "Пароли не совпадают");
+            ok = false;
+        }
+        if (register && !(cbTerms.isChecked() && cbPrivacy.isChecked() && cbConsent.isChecked())) {
+            errConsent.setText("Отметьте все три пункта, чтобы создать аккаунт.");
+            errConsent.setVisibility(View.VISIBLE);
             ok = false;
         }
         if (!ok) return;

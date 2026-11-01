@@ -9,6 +9,8 @@ public class Account {
     public String email;
     public String avatar = AvatarSpec.DEFAULT;
     public String currency = Currency.RUB.name();
+    /** Дата согласия на обработку данных, у старых аккаунтов пусто */
+    public String consentDate = "";
 
     public AvatarSpec avatarSpec() {
         return AvatarSpec.parse(avatar);

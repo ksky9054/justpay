@@ -1371,6 +1371,94 @@
                 android:src="@drawable/ic_chevron_right" />
         </LinearLayout>
 
+        <!-- Документы -->
+        <TextView
+            style="@style/Jp.Section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Документы" />
+
+        <LinearLayout
+            style="@style/Jp.Card.Divided"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+
+            <LinearLayout
+                android:id="@+id/row_doc_terms"
+                style="@style/Jp.Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Пользовательское соглашение"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_doc_privacy"
+                style="@style/Jp.Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Политика обработки данных"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_doc_consent"
+                style="@style/Jp.Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Согласие на обработку данных"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+        </LinearLayout>
+
+
         <!-- Подвал -->
         <LinearLayout
             android:layout_width="match_parent"

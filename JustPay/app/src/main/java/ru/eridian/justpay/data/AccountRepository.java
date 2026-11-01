@@ -46,6 +46,8 @@ public final class AccountRepository {
         v.put(JustPayDbHelper.A_ITER, PasswordHasher.ITERATIONS);
         v.put(JustPayDbHelper.A_HASH, PasswordHasher.hash(password, salt, PasswordHasher.ITERATIONS));
         v.put(JustPayDbHelper.A_CREATED, LocalDate.now().toString());
+        // Аккаунт создаётся только после отметок согласия, дату сохраняем
+        v.put(JustPayDbHelper.A_CONSENT, LocalDate.now().toString());
         long id = helper.getWritableDatabase().insert(JustPayDbHelper.T_ACCOUNTS, null, v);
         if (id < 0) throw new AccountException("Не удалось создать аккаунт");
         return find(id);
@@ -131,6 +133,7 @@ public final class AccountRepository {
         a.email = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_EMAIL));
         a.avatar = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_AVATAR));
         a.currency = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_CURRENCY));
+        a.consentDate = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_CONSENT));
         return a;
     }
 }

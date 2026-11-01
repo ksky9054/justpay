@@ -48,6 +48,7 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.NotificationsActivity" android:exported="false" />
+        <activity android:name=".ui.LegalActivity" android:exported="false" />
 
         <!-- Сигнал будильника только от самого приложения -->
         <receiver android:name=".reminder.ReminderReceiver" android:exported="false" />
