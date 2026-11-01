@@ -13,7 +13,7 @@ public final class AvatarSpec {
 
     public static final String[] SYMBOLS = {INITIALS, PLANET, STAR, MOON, COMET, RING, PHOTO};
     public static final int[] COLORS = {
-            0xFF8B9BFF, 0xFF41DA98, 0xFFFFA438, 0xFFFF6B56, 0xFFB367FF, 0xFF4BC8FF};
+            0xFF8B9BFF, 0xFF90D5AE, 0xFFFCB974, 0xFFFFB4A8, 0xFFDBB9F9, 0xFF8ECFF2};
     public static final String[] COLOR_NAMES = {"Индиго", "Мята", "Янтарь", "Коралл", "Сирень", "Небо"};
     public static final String[] SYMBOL_NAMES = {"Инициалы", "Планета", "Звезда", "Луна", "Комета", "Кольцо", "Фото"};
 
