@@ -1,9 +1,6 @@
 package ru.eridian.justpay.data;
 
-/**
- * Валюта аккаунта. Суммы вводятся и показываются в ней, курсов и пересчёта нет:
- * приложение работает без интернета, а свежие курсы взять неоткуда.
- */
+/** Валюта аккаунта */
 public enum Currency {
     RUB("₽", "Российский рубль", 0),
     USD("$", "Доллар США", 2),
@@ -14,7 +11,7 @@ public enum Currency {
 
     public final String symbol;
     public final String title;
-    /** Знаков после запятой в итоговых суммах: 0 для рубля и тенге, 2 для остальных. */
+    /** Знаков после запятой в суммах */
     public final int digits;
 
     Currency(String symbol, String title, int digits) {

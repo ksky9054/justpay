@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import ru.eridian.justpay.R;
+import ru.eridian.justpay.data.Accent;
 import ru.eridian.justpay.data.Account;
 import ru.eridian.justpay.data.AccountRepository;
 import ru.eridian.justpay.data.AvatarSpec;
@@ -28,12 +30,13 @@ import ru.eridian.justpay.usage.UsageAccess;
 import ru.eridian.justpay.util.AvatarPhoto;
 import ru.eridian.justpay.util.Fmt;
 
-/** Вкладка «Профиль»: аккаунт, тема, напоминания, доступ к статистике, способы оплаты. */
+/** Вкладка «Профиль» */
 final class ProfileTab {
     private final MainActivity a;
     private final AvatarView avatar;
     private final TextView name, email, currencyText;
     private final TextView themeDark, themeLight;
+    private final ViewGroup accentRow;
     private final Switch remindSwitch, streakSwitch, idleSwitch;
     private final View remindDays;
     private final TextView day1, day3, day7, dayCustom;
@@ -48,6 +51,7 @@ final class ProfileTab {
         email = screen.findViewById(R.id.pf_email);
         themeDark = screen.findViewById(R.id.theme_dark);
         themeLight = screen.findViewById(R.id.theme_light);
+        accentRow = screen.findViewById(R.id.accent_row);
         remindSwitch = screen.findViewById(R.id.remind_switch);
         streakSwitch = screen.findViewById(R.id.streak_switch);
         idleSwitch = screen.findViewById(R.id.idle_switch);
@@ -65,6 +69,7 @@ final class ProfileTab {
         screen.findViewById(R.id.currency_row).setOnClickListener(v -> openCurrency());
         themeDark.setOnClickListener(v -> setDark(true));
         themeLight.setOnClickListener(v -> setDark(false));
+        addAccentCircles();
 
         screen.findViewById(R.id.remind_row).setOnClickListener(v -> {
             boolean on = !a.prefs.isRemind();
@@ -112,7 +117,7 @@ final class ProfileTab {
         }, this::pickPhoto, () -> deletePhoto(acc));
     }
 
-    /** Системный выбор картинки: отдельное разрешение на доступ к фото не требуется. */
+    /** Системный выбор картинки, разрешения не нужны */
     private void pickPhoto() {
         Intent pick = new Intent(Intent.ACTION_GET_CONTENT)
                 .setType("image/*")
@@ -120,11 +125,11 @@ final class ProfileTab {
         try {
             a.startActivityForResult(pick, MainActivity.REQ_PHOTO);
         } catch (ActivityNotFoundException e) {
-            Toaster.show(a, "На телефоне нет приложения для выбора фото");
+            Toaster.show(a, "Нет приложения для выбора фото");
         }
     }
 
-    /** Результат выбора картинки: обрабатываем в фоне и делаем её аватаром. */
+    /** Результат выбора: обрабатываем в фоне и ставим аватаром */
     void onPhotoPicked(Uri uri) {
         Account acc = AccountRepository.get(a).find(a.prefs.accountId());
         if (acc == null) return;
@@ -160,11 +165,7 @@ final class ProfileTab {
 
     private boolean loadingRates;
 
-    /**
-     * Смена валюты. Если в аккаунте есть подписки, пытаемся получить курс Банка России:
-     * с интернетом предлагаем пересчитать цены, без него честно говорим, что пересчёт не работает,
-     * и предлагаем сменить валюту, оставив цены прежними числами.
-     */
+    /** Смена валюты: с интернетом пересчитываем цены по курсу, без него предупреждаем */
     private void pickCurrency(Account acc, Currency to) {
         Currency from = acc.currencyValue();
         List<Subscription> subs = a.repo.all();
@@ -195,18 +196,17 @@ final class ProfileTab {
         double converted = Math.max(0.01, Math.round(biggest.price * factor * 100) / 100.0);
         String note = "Курс Банка России на " + rates.date + ": " + rates.describe(to, from) + ". "
                 + "Цены " + subs.size() + " " + Fmt.pl(subs.size(), "подписки", "подписок", "подписок")
-                + " будут пересчитаны: например, " + Fmt.price(biggest.price) + " станет "
-                + Fmt.priceIn(to, converted) + ". При обратном пересчёте возможны отличия на копейки из-за округления.";
+                + " пересчитаются: " + Fmt.price(biggest.price) + " станет "
+                + Fmt.priceIn(to, converted) + ". Из-за округления возможна разница в копейки.";
         ConfirmSheet.show(a, "Пересчитать цены в валюту «" + to.title + "»?", 0, null, note,
                 "Пересчитать", false,
                 () -> applyCurrency(acc, to, factor, "Цены пересчитаны: " + from.symbol + " → " + to.symbol));
     }
 
     private void offerWithoutConversion(Account acc, Currency to, List<Subscription> subs) {
-        String note = "Не удалось получить курс: нет интернета или сервер недоступен, поэтому пересчитать цены сейчас нельзя. "
-                + "Можно сменить валюту без пересчёта: цены останутся прежними числами (" + Fmt.price(subs.get(0).price)
-                + " станет " + Fmt.priceIn(to, subs.get(0).price) + "), и их нужно будет проверить вручную. "
-                + "Или отмените и повторите, когда появится сеть.";
+        String note = "Курс получить не удалось: нет интернета. "
+                + "Валюту можно сменить без пересчёта, цены останутся прежними числами (" + Fmt.price(subs.get(0).price)
+                + " станет " + Fmt.priceIn(to, subs.get(0).price) + "), их придётся проверить вручную.";
         ConfirmSheet.show(a, "Конвертация не работает", 0, null, note, "Сменить без пересчёта", false,
                 () -> applyCurrency(acc, to, 1.0, "Валюта: " + to.title + ". Цены не пересчитаны"));
     }
@@ -216,6 +216,39 @@ final class ProfileTab {
         Fmt.setCurrency(to);
         a.refreshAll();
         Toaster.show(a, message);
+    }
+
+    // Круги выбора цвета акцента
+    private void addAccentCircles() {
+        Accent[] colors = Accent.values();
+        for (int i = 0; i < colors.length; i++) {
+            View circle = new View(a);
+            int size = Ui.dp(a, 36);
+            circle.setLayoutParams(new ViewGroup.LayoutParams(size, size));
+            circle.setContentDescription(colors[i].title);
+            int number = i;
+            circle.setOnClickListener(v -> {
+                if (a.prefs.accent() == number) return;
+                a.prefs.setAccent(number);
+                a.recreate();
+            });
+            accentRow.addView(circle);
+        }
+        paintAccentCircles();
+    }
+
+    // Выбранный цвет с кольцом
+    private void paintAccentCircles() {
+        Accent[] colors = Accent.values();
+        for (int i = 0; i < colors.length; i++) {
+            GradientDrawable shape = new GradientDrawable();
+            shape.setShape(GradientDrawable.OVAL);
+            shape.setColor(colors[i].swatch);
+            if (i == a.prefs.accent()) {
+                shape.setStroke(Ui.dp(a, 3), Ui.attr(a, R.attr.jpTx));
+            }
+            accentRow.getChildAt(i).setBackground(shape);
+        }
     }
 
     private void setDark(boolean dark) {
@@ -239,7 +272,7 @@ final class ProfileTab {
         Account acc = AccountRepository.get(a).find(a.prefs.accountId());
         if (acc == null) return;
         ConfirmSheet.show(a, "Удалить аккаунт?", 0, null,
-                "Аккаунт «" + acc.email + "», все его подписки и статистика будут удалены с телефона. Восстановить их будет нельзя.",
+                "Аккаунт «" + acc.email + "». Подписки и статистика удалятся с телефона. Восстановить нельзя.",
                 "Удалить", true, () -> {
                     AccountRepository.get(a).delete(acc.id);
                     AvatarPhoto.delete(a, acc.id);
@@ -249,7 +282,7 @@ final class ProfileTab {
                 });
     }
 
-    /** После выхода или удаления: убираем напоминания и возвращаемся на экран входа. */
+    /** После выхода или удаления: убираем напоминания, открываем вход */
     private void endSession() {
         ReminderScheduler.reschedule(a);
         NotificationManager nm = (NotificationManager) a.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -264,7 +297,7 @@ final class ProfileTab {
         if (acc != null) {
             AvatarSpec spec = acc.avatarSpec();
             Bitmap photo = AvatarSpec.PHOTO.equals(spec.symbol) ? AvatarPhoto.load(a, acc.id) : null;
-            // Файл с фото могли удалить: тогда вместо «Фото» показываем инициалы
+            // Фото могли удалить, тогда инициалы
             if (AvatarSpec.PHOTO.equals(spec.symbol) && photo == null) spec = spec.withSymbol(AvatarSpec.INITIALS);
             avatar.setAvatar(spec, acc.initials(), photo);
             currencyText.setText(acc.currencyValue().title + ", " + acc.currencyValue().symbol);
@@ -275,6 +308,7 @@ final class ProfileTab {
         boolean dark = a.prefs.isDark();
         themeDark.setSelected(dark);
         themeLight.setSelected(!dark);
+        paintAccentCircles();
 
         boolean remind = a.prefs.isRemind();
         remindSwitch.setChecked(remind);
@@ -288,14 +322,14 @@ final class ProfileTab {
         day7.setSelected(n == 7);
         boolean custom = n != 1 && n != 3 && n != 7;
         dayCustom.setSelected(custom);
-        dayCustom.setText(custom ? (n == 0 ? "В день списания" : "За " + n + " " + Fmt.pl(n, "день", "дня", "дней")) + " · изменить" : "Свой срок…");
+        dayCustom.setText(custom ? (n == 0 ? "В день списания" : "За " + n + " " + Fmt.pl(n, "день", "дня", "дней")) + " - изменить" : "Свой срок…");
         for (View d : new View[]{day1, day3, day7, dayCustom}) d.setEnabled(remind);
 
         boolean granted = UsageAccess.isGranted(a);
-        usageStatus.setText(granted ? "Включён" : "Выключен · нажмите, чтобы включить");
+        usageStatus.setText(granted ? "Включён" : "Выключено. Нажмите, чтобы включить");
         usageStatus.setTextColor(granted ? Ui.attr(a, R.attr.jpAct) : Ui.attr(a, R.attr.jpTx2));
 
-        // Способы оплаты берутся из подписок: сколько подписок оплачивается каждым из них
+        // Способы оплаты считаем по подпискам
         Map<String, Integer> counts = new LinkedHashMap<>();
         List<Subscription> all = a.repo.all();
         for (Subscription s : all) {
@@ -325,7 +359,7 @@ final class ProfileTab {
             cards.addView(row);
         }
         cardsEmpty.setVisibility(counts.isEmpty() ? View.VISIBLE : View.GONE);
-        // У строки с подсказкой отступ сверху, пока способов оплаты нет
+        // Отступ у подсказки, пока способов оплаты нет
         cardsEmpty.setPadding(cardsEmpty.getPaddingLeft(), counts.isEmpty() ? 0 : Ui.dp(a, 4),
                 cardsEmpty.getPaddingRight(), cardsEmpty.getPaddingBottom());
     }

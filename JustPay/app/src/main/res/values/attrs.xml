@@ -1,5 +1,5 @@
 <resources>
-    <!-- Цвета темы: значения для тёмной и светлой темы заданы в themes.xml -->
+    <!-- Цвета темы, значения в themes.xml -->
     <attr name="jpBg" format="color" />
     <attr name="jpS1" format="color" />
     <attr name="jpS2" format="color" />
@@ -7,7 +7,14 @@
     <attr name="jpTx" format="color" />
     <attr name="jpTx2" format="color" />
     <attr name="jpTx3" format="color" />
-    <!-- Непрозрачный серый для значков: полупрозрачные штрихи темнеют в местах пересечения -->
+    <!-- Серый для значков без прозрачности -->
     <attr name="jpIconDim" format="color" />
     <attr name="jpAct" format="color" />
+    <!-- Кружок включённого переключателя: белый в тёмной теме, тёмный в светлой -->
+    <attr name="jpThumb" format="color" />
+    <!-- Цвет акцента: заливка и оттенки для текста -->
+    <attr name="jpAc" format="color" />
+    <attr name="jpAcFill" format="color" />
+    <attr name="jpAcTextDark" format="color" />
+    <attr name="jpAcTextLight" format="color" />
 </resources>

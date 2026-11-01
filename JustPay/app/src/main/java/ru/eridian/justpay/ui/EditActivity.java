@@ -18,7 +18,7 @@ import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.util.Fmt;
 
-/** Форма добавления и редактирования подписки с проверкой введённых значений. */
+/** Форма подписки с проверкой ввода */
 public class EditActivity extends BaseActivity {
     public static final String EXTRA_ID = "id";
 
@@ -37,9 +37,11 @@ public class EditActivity extends BaseActivity {
     private static final int REMIND_PROFILE = 0;
     private static final int REMIND_CUSTOM = 1;
     private static final int REMIND_NONE = 2;
-    /** Выбранный режим напоминания и число дней «за сколько напомнить» для своей даты. */
+    /** Режим напоминания и число дней для своей даты */
     private int remindMode = REMIND_PROFILE;
     private int remindOffset = 3;
+    // Дата напоминания, которую пользователь выбрал руками. Пока она есть, смена даты списания её не двигает
+    private LocalDate pickedRemind;
     private TextView remDefault, remCustom, remOff, fRemind, errRemind, remindHint;
 
     private EditText fName, fPrice, fCard;
@@ -83,7 +85,7 @@ public class EditActivity extends BaseActivity {
             category = editing.category;
             if (editing.next != null) date = editing.next;
             else {
-                // У подписки на паузе нет ни даты списания, ни напоминания
+                // У паузы нет ни даты списания, ни напоминания
                 findViewById(R.id.date_block).setVisibility(View.GONE);
                 findViewById(R.id.remind_block).setVisibility(View.GONE);
             }
@@ -105,6 +107,8 @@ public class EditActivity extends BaseActivity {
         if (savedInstanceState != null) {
             remindMode = savedInstanceState.getInt("rmode", remindMode);
             remindOffset = savedInstanceState.getInt("roffset", remindOffset);
+            String picked = savedInstanceState.getString("rpicked");
+            if (picked != null) pickedRemind = LocalDate.parse(picked);
         }
 
         remDefault = findViewById(R.id.rem_default);
@@ -153,6 +157,7 @@ public class EditActivity extends BaseActivity {
         out.putString("date", date.toString());
         out.putInt("rmode", remindMode);
         out.putInt("roffset", remindOffset);
+        if (pickedRemind != null) out.putString("rpicked", pickedRemind.toString());
     }
 
     @Override
@@ -160,8 +165,6 @@ public class EditActivity extends BaseActivity {
         finishToBottom();
         return true;
     }
-
-    // ----- элементы формы -----
 
     private void buildQuickChips() {
         LinearLayout row = findViewById(R.id.quick_row);
@@ -226,6 +229,11 @@ public class EditActivity extends BaseActivity {
         Ui.hideKeyboard(this);
         DatePickerDialog d = new DatePickerDialog(this, (view, y, m, day) -> {
             date = LocalDate.of(y, m + 1, day);
+            // Выбранная дата напоминания остаётся на месте, но не позже самого списания
+            if (pickedRemind != null) {
+                LocalDate keep = pickedRemind.isAfter(date) ? date : pickedRemind;
+                remindOffset = (int) Fmt.diff(date, keep);
+            }
             updateDateUi();
             updateRemindUi();
             if (tried) validate(false);
@@ -236,8 +244,6 @@ public class EditActivity extends BaseActivity {
         d.getDatePicker().setMaxDate(max);
         d.show();
     }
-
-    // ----- напоминание -----
 
     private boolean hasRemindBlock() {
         return editing == null || editing.next != null;
@@ -250,7 +256,7 @@ public class EditActivity extends BaseActivity {
     private void setRemindMode(int mode) {
         remindMode = mode;
         if (mode == REMIND_CUSTOM) {
-            // Первое включение: предлагаем дату по настройке профиля, но не раньше сегодняшнего дня
+            // Предлагаем дату по настройке профиля, но не раньше сегодня
             long max = Math.max(0, Fmt.diff(date, today()));
             if (remindOffset > max) remindOffset = (int) max;
         }
@@ -263,7 +269,8 @@ public class EditActivity extends BaseActivity {
         LocalDate shown = customRemindDate();
         if (shown.isBefore(today())) shown = today();
         DatePickerDialog d = new DatePickerDialog(this, (view, y, m, day) -> {
-            remindOffset = (int) Fmt.diff(date, LocalDate.of(y, m + 1, day));
+            pickedRemind = LocalDate.of(y, m + 1, day);
+            remindOffset = (int) Fmt.diff(date, pickedRemind);
             updateRemindUi();
             if (tried) validate(false);
         }, shown.getYear(), shown.getMonthValue() - 1, shown.getDayOfMonth());
@@ -290,20 +297,18 @@ public class EditActivity extends BaseActivity {
             fRemind.setText(Fmt.dayFull(rd));
             hint = "Напомним " + Fmt.dayLong(rd) + " в 09:00, " + beforeText(remindOffset) + ".";
         } else if (remindMode == REMIND_NONE) {
-            hint = "Уведомления по этой подписке не придут.";
+            hint = "Уведомлений не будет.";
         } else if (prefs.isRemind()) {
             int n = prefs.remindDays();
             hint = "Напомним " + Fmt.dayLong(date.minusDays(n)) + " в 09:00, " + beforeText(n)
                     + ". Срок задан в профиле.";
         } else {
-            hint = "В профиле напоминания выключены, поэтому уведомление не придёт. Выберите «Своя дата», чтобы включить его для этой подписки.";
+            hint = "Напоминания выключены в профиле. Выберите «Своя дата», чтобы включить для этой подписки.";
         }
         remindHint.setText(hint);
     }
 
-    // ----- проверка и расчёт -----
-
-    /** Возвращает сумму или -1, если поле пустое либо содержит не число. */
+    /** Сумма или -1, если поле пустое или не число */
     private double parsePrice() {
         String raw = fPrice.getText().toString().trim().replace(',', '.');
         if (raw.isEmpty() || raw.equals(".")) return -1;
@@ -317,11 +322,11 @@ public class EditActivity extends BaseActivity {
     private void updatePreview() {
         double p = parsePrice();
         if (p <= 0 || p > MAX_PRICE) {
-            preview.setText("Укажите стоимость — посчитаем, сколько это в месяц и в год.");
+            preview.setText("Укажите стоимость, и появится сумма в месяц и в год.");
             return;
         }
         double month = Subscription.monthly(p, cycle);
-        StringBuilder sb = new StringBuilder("≈ " + Fmt.money(month) + " в месяц · " + Fmt.money(month * 12) + " в год.");
+        StringBuilder sb = new StringBuilder("≈ " + Fmt.money(month) + " в месяц - " + Fmt.money(month * 12) + " в год.");
         if (editing == null || editing.isActive()) {
             double others = 0;
             List<Subscription> all = repo.all();
@@ -340,7 +345,7 @@ public class EditActivity extends BaseActivity {
         if (bad) error.setText(message);
     }
 
-    /** Показывает ошибки у полей; возвращает true, если всё заполнено верно. */
+    /** Показывает ошибки, true если всё верно */
     private boolean validate(boolean focusFirst) {
         String name = fName.getText().toString().trim();
         String nameErr = name.isEmpty() ? "Введите название сервиса" : null;
@@ -348,17 +353,17 @@ public class EditActivity extends BaseActivity {
         double p = parsePrice();
         String priceErr = null;
         if (p <= 0) priceErr = "Укажите сумму больше нуля";
-        else if (p > MAX_PRICE) priceErr = "Сумма слишком большая: не больше " + Fmt.price(MAX_PRICE);
+        else if (p > MAX_PRICE) priceErr = "Сумма не больше " + Fmt.price(MAX_PRICE);
 
         String dateErr = null;
         boolean needsDate = editing == null || editing.next != null;
-        // Дату, которую не меняли, не ругаем: за время редактирования она могла стать вчерашней
+        // Старую дату не ругаем: после полуночи она могла стать вчерашней
         boolean dateUnchanged = editing != null && date.equals(editing.next);
-        if (needsDate && !dateUnchanged && date.isBefore(today())) dateErr = "Дата списания не может быть в прошлом";
+        if (needsDate && !dateUnchanged && date.isBefore(today())) dateErr = "Дата в прошлом";
 
         String remindErr = null;
         if (hasRemindBlock() && remindMode == REMIND_CUSTOM && customRemindDate().isBefore(today())) {
-            remindErr = "Дата напоминания уже прошла: выберите день от сегодняшнего до даты списания";
+            remindErr = "Выберите дату от сегодня до списания";
         }
 
         showError(fName, errName, nameErr);
@@ -385,7 +390,7 @@ public class EditActivity extends BaseActivity {
 
     private static String makeMark(String name) {
         String clean = name.replaceAll("[^A-Za-zА-Яа-яЁё0-9]", "");
-        if (clean.isEmpty()) return "—";
+        if (clean.isEmpty()) return "?";
         return clean.substring(0, Math.min(2, clean.length()));
     }
 
@@ -410,7 +415,7 @@ public class EditActivity extends BaseActivity {
             s.since = Fmt.monthYear(today());
             s.remindDays = remindValue();
             repo.insert(s);
-            Toaster.post("«" + name + "» добавлена · " + Fmt.money(Subscription.monthly(price, cycle)) + " в месяц");
+            Toaster.post("«" + name + "» добавлена - " + Fmt.money(Subscription.monthly(price, cycle)) + " в месяц");
         } else {
             if (!name.equals(editing.name)) editing.mark = makeMark(name);
             editing.name = name;
@@ -419,7 +424,7 @@ public class EditActivity extends BaseActivity {
             editing.category = category;
             editing.card = fCard.getText().toString().trim();
             if (editing.next != null) {
-                // Сменили дату списания или напоминания: уведомление может прийти заново
+                // Дата сменилась: напоминание может прийти заново
                 if (!date.equals(editing.next) || editing.remindDays != remindValue()) {
                     prefs.forgetNotified(editing.id);
                 }

@@ -69,16 +69,6 @@
             android:paddingEnd="20dp">
 
             <TextView
-                android:id="@+id/d_mk"
-                style="@style/Jp.Disp"
-                android:layout_width="76dp"
-                android:layout_height="76dp"
-                android:background="@drawable/d_card"
-                android:gravity="center"
-                android:maxLines="1"
-                android:textSize="18sp" />
-
-            <TextView
                 android:id="@+id/d_name"
                 style="@style/Jp.Bold"
                 android:layout_width="wrap_content"
@@ -545,6 +535,7 @@
 
         <!-- История списаний -->
         <TextView
+            android:id="@+id/d_hist_title"
             style="@style/Jp.Bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -585,7 +576,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Удалить из JustPay" />
+                android:text="Удалить из JustPay"
+                android:textColor="@color/jp_err" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

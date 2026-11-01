@@ -1,9 +1,6 @@
 package ru.eridian.justpay.data;
 
-/**
- * Аватар аккаунта: знак и цвет либо собственная фотография (знак «photo»). Хранится строкой
- * «знак:цвет». Сама фотография не в базе, а в приватной папке приложения.
- */
+/** Аватар: знак и цвет, хранится строкой «знак:цвет» */
 public final class AvatarSpec {
     public static final String INITIALS = "initials";
     public static final String PLANET = "planet";
@@ -11,14 +8,12 @@ public final class AvatarSpec {
     public static final String MOON = "moon";
     public static final String COMET = "comet";
     public static final String RING = "ring";
-    /** Фотография из галереи, лежит в приватной папке приложения (AvatarPhoto). */
+    /** Фото из галереи */
     public static final String PHOTO = "photo";
 
-    /** Порядок знаков в выборе. */
     public static final String[] SYMBOLS = {INITIALS, PLANET, STAR, MOON, COMET, RING, PHOTO};
-    /** Цвета: акцент JustPay и три варианта акцента из макета, ещё два в тон им. */
     public static final int[] COLORS = {
-            0xFF8B9BFF, 0xFF5FE0A8, 0xFFFFB45C, 0xFFFF8A7A, 0xFFC58BFF, 0xFF6FD3FF};
+            0xFF8B9BFF, 0xFF41DA98, 0xFFFFA438, 0xFFFF6B56, 0xFFB367FF, 0xFF4BC8FF};
     public static final String[] COLOR_NAMES = {"Индиго", "Мята", "Янтарь", "Коралл", "Сирень", "Небо"};
     public static final String[] SYMBOL_NAMES = {"Инициалы", "Планета", "Звезда", "Луна", "Комета", "Кольцо", "Фото"};
 
@@ -32,7 +27,7 @@ public final class AvatarSpec {
         this.colorIndex = colorIndex >= 0 && colorIndex < COLORS.length ? colorIndex : 0;
     }
 
-    /** Разбирает строку из базы; при любой ошибке возвращает аватар по умолчанию. */
+    /** Разбирает строку из базы, при ошибке даёт аватар по умолчанию */
     public static AvatarSpec parse(String s) {
         if (s == null) return new AvatarSpec(INITIALS, 0);
         String[] p = s.split(":");

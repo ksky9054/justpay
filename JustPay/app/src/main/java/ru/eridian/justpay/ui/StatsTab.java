@@ -28,7 +28,7 @@ import ru.eridian.justpay.data.UsageMetrics;
 import ru.eridian.justpay.data.UsageRepository;
 import ru.eridian.justpay.util.Fmt;
 
-/** Вкладка «Аналитика»: траты в год, разбивка по категориям, самые дорогие подписки, экономия. */
+/** Вкладка «Аналитика» */
 final class StatsTab {
     private final MainActivity a;
     private final TextView year, sub, insight, pausedN, saved, catsEmpty;
@@ -74,7 +74,7 @@ final class StatsTab {
         }
     }
 
-    /** Общая серия и подписки, которыми давно не пользовались. */
+    /** Серия и неиспользуемые подписки */
     private void bindActivity(List<Subscription> all) {
         LocalDate today = LocalDate.now();
         Map<Long, Map<LocalDate, UsageDay>> usage = UsageRepository.get(a).allForAccount();
@@ -83,23 +83,23 @@ final class StatsTab {
         int current = UsageMetrics.currentStreak(any, today);
         int record = UsageMetrics.longestStreak(any);
 
-        star.setColorFilter(current == 0 ? Ui.attr(a, R.attr.jpTx3) : a.getColor(R.color.jp_ac));
+        star.setColorFilter(current == 0 ? Ui.attr(a, R.attr.jpTx3) : Ui.attr(a, R.attr.jpAc));
         star.setAlpha(current > 0 && !doneToday ? 0.6f : 1f);
         streak.setText(String.valueOf(current));
         streakLabel.setText(Fmt.pl(current, "день подряд", "дня подряд", "дней подряд"));
-        if (all.isEmpty()) best.setText("Добавьте подписку, чтобы вести серию");
-        else if (current > 0 && !doneToday) best.setText("Отметьте использование сегодня, чтобы не потерять серию");
+        if (all.isEmpty()) best.setText("Добавьте подписку для серии");
+        else if (current > 0 && !doneToday) best.setText("Отметьте сегодня, иначе серия прервётся");
         else if (record > 0) best.setText("Рекорд: " + record + " " + Fmt.pl(record, "день", "дня", "дней"));
         else best.setText("Пока нет ни одной отметки");
         UsagePanel.buildWeek(a, week, any, today);
 
-        // Подписки без активности больше двух недель (то же правило, что у уведомления)
+        // Без активности больше двух недель, как в уведомлении
         List<Subscription> idle = UsageInsights.idle(all, usage, today, UsageInsights.IDLE_DAYS);
         double idleSum = UsageInsights.monthlySum(idle);
         unusedList.removeAllViews();
         unusedCard.setVisibility(idle.isEmpty() ? View.GONE : View.VISIBLE);
         if (idle.isEmpty()) return;
-        unusedSub.setText("Они стоят " + Fmt.money(idleSum) + " в месяц. Если подписки не нужны, поставьте их на паузу.");
+        unusedSub.setText("Они стоят " + Fmt.money(idleSum) + " в месяц. Ненужные поставьте на паузу.");
         LayoutInflater inflater = LayoutInflater.from(a);
         for (int i = 0; i < idle.size(); i++) {
             Subscription s = idle.get(i);
@@ -134,7 +134,7 @@ final class StatsTab {
         bindActivity(all);
 
         year.setText(Fmt.money(total * 12));
-        sub.setText(Fmt.money(total) + " в месяц · " + Fmt.money(total * 12 / 365) + " в день");
+        sub.setText(Fmt.money(total) + " в месяц - " + Fmt.money(total * 12 / 365) + " в день");
 
         // Категории
         Map<String, Cat> map = new LinkedHashMap<>();
@@ -150,7 +150,7 @@ final class StatsTab {
         List<Cat> cats = new ArrayList<>(map.values());
         Collections.sort(cats, (x, y) -> Double.compare(y.sum, x.sum));
 
-        int ac = a.getColor(R.color.jp_ac);
+        int ac = Ui.attr(a, R.attr.jpAc);
         int s1 = Ui.attr(a, R.attr.jpS1);
         int tx = Ui.attr(a, R.attr.jpTx);
         int[] colors = {
@@ -188,14 +188,14 @@ final class StatsTab {
         bar.setVisibility(cats.isEmpty() ? View.GONE : View.VISIBLE);
         catsEmpty.setVisibility(cats.isEmpty() ? View.VISIBLE : View.GONE);
 
-        // Вывод по самой затратной категории
+        // Самая затратная категория
         if (cats.isEmpty()) {
             insight.setVisibility(View.GONE);
         } else {
             Cat c = cats.get(0);
-            String head = c.name + " — " + Math.round(c.sum / total * 100) + "% расходов.";
+            String head = c.name + ": " + Math.round(c.sum / total * 100) + "% расходов.";
             String body = " Это " + c.n + " " + Fmt.pl(c.n, "подписка", "подписки", "подписок")
-                    + " на " + Fmt.money(c.sum * 12) + " в год. Проверьте, всеми ли вы пользуетесь.";
+                    + " на " + Fmt.money(c.sum * 12) + " в год. Проверьте, всем ли пользуетесь.";
             SpannableStringBuilder sb = new SpannableStringBuilder(head + body);
             sb.setSpan(new StyleSpan(Typeface.BOLD), 0, head.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             insight.setText(sb);
@@ -228,7 +228,7 @@ final class StatsTab {
                 if (names.length() > 0) names.append(", ");
                 names.append(s.name);
             }
-            pausedN.setText(names + " · " + Fmt.money(savedSum * 12) + " в год");
+            pausedN.setText(names + " - " + Fmt.money(savedSum * 12) + " в год");
         }
     }
 }

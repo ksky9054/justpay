@@ -8,10 +8,7 @@ import java.util.Base64;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-/**
- * Хеширование паролей: PBKDF2 с HMAC-SHA256, своя случайная соль у каждого аккаунта.
- * Сам пароль нигде не хранится, в базе лежат только соль и хеш.
- */
+/** Хеш пароля: PBKDF2 с солью, сам пароль не хранится */
 public final class PasswordHasher {
     private PasswordHasher() {}
 
@@ -39,7 +36,7 @@ public final class PasswordHasher {
         }
     }
 
-    /** Сравнение за постоянное время, чтобы по скорости ответа нельзя было угадывать хеш. */
+    /** Сравнение за постоянное время */
     public static boolean matches(String password, String saltBase64, int iterations, String expectedHash) {
         byte[] actual = hash(password, saltBase64, iterations).getBytes();
         return MessageDigest.isEqual(actual, expectedHash.getBytes());

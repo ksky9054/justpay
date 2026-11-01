@@ -102,14 +102,6 @@
                     android:text="Удалить фото"
                     android:textColor="@color/jp_err" />
             </LinearLayout>
-
-            <TextView
-                style="@style/Jp.Caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:lineSpacingMultiplier="1.15"
-                android:text="Фото выбирается в системном окне, обрезается до квадрата и хранится только на этом телефоне. Не используйте чужие фотографии без согласия людей на них." />
         </LinearLayout>
     </ScrollView>
 

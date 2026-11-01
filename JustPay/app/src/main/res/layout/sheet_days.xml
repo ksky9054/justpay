@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:lineSpacingMultiplier="1.15"
-        android:text="За сколько дней до списания присылать уведомление. Так будет у всех подписок, у которых не задана своя дата."
+        android:text="За сколько дней напомнить о списании."
         android:textColor="?attr/jpTx2"
         android:textSize="13sp" />
 

@@ -212,7 +212,7 @@ app/src/main/res/   layout, drawable (векторные иконки и лог�
 
 ## Известные отличия от дизайна
 
-- Шрифты Manrope (текст) и Unbounded (крупные цифры и заголовки) лежат в `res/font` и подключены
+- Шрифты IBM Plex Sans (текст) и Exo 2 (крупные цифры и заголовки) лежат в `res/font` и подключены
   в стилях `Jp.Text`, `Jp.Semi`, `Jp.Bold`, `Jp.Disp`. Это вариативные шрифты: нужное начертание
   задаётся через `fontVariationSettings` в `res/font/*.xml`.
 - Добавлены поле поиска и кнопка «Изменить»: их требует Положение, в макете их не было.
@@ -227,8 +227,10 @@ app/src/main/res/   layout, drawable (векторные иконки и лог�
 | Логотип JustPay, знак «Эридиан» | авторский макет команды |
 | Gradle Wrapper | Gradle Inc., Apache License 2.0 |
 | Курсы валют | Банк России, официальные курсы, `https://www.cbr.ru/scripts/XML_daily.asp`. Данные запрашиваются при смене валюты и не сохраняются. Перед коммерческим запуском нужно проверить условия использования данных ЦБ РФ |
-| Шрифт Manrope | The Manrope Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/manrope`), текст лицензии: `licenses/Manrope-OFL.txt` |
-| Шрифт Unbounded | The Unbounded Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/unbounded`), текст лицензии: `licenses/Unbounded-OFL.txt` |
+| Шрифт IBM Plex Sans | IBM Corp., SIL OFL 1.1, источник: github.com/google/fonts (`ofl/ibmplexsans`), текст лицензии: `licenses/IBMPlexSans-OFL.txt` |
+| Шрифт Exo 2 | The Exo 2 Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/exo2`), текст лицензии: `licenses/Exo2-OFL.txt` |
+| Шрифт Manrope (запасной, сейчас не используется) | The Manrope Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/manrope`), текст лицензии: `licenses/Manrope-OFL.txt` |
+| Шрифт Unbounded (надпись логотипа) | The Unbounded Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/unbounded`), текст лицензии: `licenses/Unbounded-OFL.txt` |
 
 Сторонних библиотек в приложении нет. Шрифты распространяются вместе с приложением по условиям OFL:
 файлы не изменялись, текст лицензии приложен.

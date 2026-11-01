@@ -20,35 +20,27 @@ import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.data.SubscriptionRepository;
 import ru.eridian.justpay.data.UsageRepository;
 
-/**
- * Забирает из статистики телефона, сколько раз и сколько времени пользователь провёл
- * в приложении сервиса. Читаются данные только приложений, которые пользователь сам привязал
- * к подписке. Ничего не отправляется в сеть, результат сохраняется в таблице usage_days.
- *
- * Android хранит события использования недолго (около недели), поэтому статистика копится
- * в базе при каждом открытии JustPay, а уже записанные дни не стираются.
- */
+/** Берёт из статистики телефона открытия и время в приложениях; Android хранит события около недели, поэтому копим в базе */
 public final class UsageSync {
     private UsageSync() {}
 
     private static final int WINDOW_DAYS = 7;
-    /** Возврат в приложение быстрее этого срока считается продолжением того же открытия. */
+    /** Возврат быстрее этого срока считаем тем же открытием */
     private static final long SAME_LAUNCH_GAP_MS = 15_000;
-    // Типы событий: ACTIVITY_RESUMED = 1 и ACTIVITY_PAUSED = 2
-    // (на Android 8-9 те же числа называются MOVE_TO_FOREGROUND и MOVE_TO_BACKGROUND).
+    // События: 1 - приложение на экране, 2 - ушло с экрана
     private static final int EVENT_FOREGROUND = 1;
     private static final int EVENT_BACKGROUND = 2;
 
     private static final Executor IO = Executors.newSingleThreadExecutor();
 
-    /** Синхронизация в фоновом потоке; onDone вызывается там же, обновлять экран нужно через runOnUiThread. */
+    /** Работает в фоне, экран обновлять через runOnUiThread */
     public static void syncAsync(Context context, Runnable onDone) {
         Context app = context.getApplicationContext();
         IO.execute(() -> {
             try {
                 sync(app);
             } catch (RuntimeException ignored) {
-                // Статистика необязательна: сбой чтения не должен ронять приложение
+                // Сбой чтения статистики не должен ронять приложение
             }
             if (onDone != null) onDone.run();
         });
@@ -100,14 +92,13 @@ public final class UsageSync {
             if (c == null) continue;
             for (Map.Entry<LocalDate, int[]> d : c.perDay.entrySet()) {
                 int opens = d.getValue()[0], seconds = d.getValue()[1];
-                // Нулевые дни не пишем: события старше недели система уже могла удалить,
-                // и пустой ответ не должен затирать то, что накопилось раньше.
+                // Нулевые дни не пишем: старые события могли удалиться, пустой ответ не должен затирать накопленное
                 if (opens > 0 || seconds > 0) usage.saveAuto(s.id, d.getKey(), opens, seconds);
             }
         }
     }
 
-    /** Учитывает одно событие. Вынесено отдельно, чтобы логику можно было проверить без Android. */
+    /** Учитывает одно событие */
     static void apply(Counter c, int type, long ts, ZoneId zone) {
         if (type == EVENT_FOREGROUND) {
             if (c.fgSince < 0) {

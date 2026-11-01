@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-/** Раскладка с переносом дочерних элементов на новую строку (для чипов категорий). */
+/** Раскладка с переносом на новую строку */
 public class FlowLayout extends ViewGroup {
     private final int gap;
 

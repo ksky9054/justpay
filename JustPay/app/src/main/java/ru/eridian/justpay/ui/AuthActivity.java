@@ -18,11 +18,11 @@ import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.Account;
 import ru.eridian.justpay.data.AccountRepository;
 
-/** Вход в локальный аккаунт и регистрация нового. Аккаунты хранятся только на этом устройстве. */
+/** Вход и регистрация, аккаунты хранятся только на телефоне */
 public class AuthActivity extends BaseActivity {
     private static final int MAX_FAILS = 5;
     private static final long LOCK_MS = 30_000;
-    // Защита от перебора пароля: считаем неудачные входы и временно блокируем кнопку
+    // Защита от перебора пароля: считаем неудачные входы
     private static int fails = 0;
     private static long lockedUntil = 0;
 
@@ -85,7 +85,7 @@ public class AuthActivity extends BaseActivity {
             }
             return false;
         });
-        // Для входа на клавиатуре у пароля кнопка «Готово»
+        // Кнопка «Готово» на клавиатуре
         setMode(register);
     }
 
@@ -109,8 +109,8 @@ public class AuthActivity extends BaseActivity {
         blockPass2.setVisibility(reg ? View.VISIBLE : View.GONE);
         title.setText(reg ? "Создайте аккаунт" : "С возвращением");
         subtitle.setText(reg
-                ? "Новый аккаунт пуст: подписки, платежи и отметки вы добавите сами."
-                : "Войдите, чтобы увидеть свои подписки.");
+                ? "Новый аккаунт пуст."
+                : "Войдите в аккаунт.");
         submit.setText(reg ? "Создать аккаунт" : "Войти");
         aPass.setImeOptions(reg ? EditorInfo.IME_ACTION_NEXT : EditorInfo.IME_ACTION_DONE);
         clearErrors();
@@ -173,7 +173,7 @@ public class AuthActivity extends BaseActivity {
 
         long wait = lockedUntil - SystemClock.elapsedRealtime();
         if (!register && wait > 0) {
-            authError.setText("Слишком много попыток. Подождите " + ((wait + 999) / 1000) + " с.");
+            authError.setText("Много попыток. Подождите " + ((wait + 999) / 1000) + " с.");
             authError.setVisibility(View.VISIBLE);
             return;
         }
@@ -181,7 +181,7 @@ public class AuthActivity extends BaseActivity {
         setBusy(true);
         Ui.hideKeyboard(this);
         AccountRepository accounts = AccountRepository.get(this);
-        // Хеширование пароля занимает заметное время, поэтому выполняется не в главном потоке
+        // Хеширование долгое, делаем не в главном потоке
         WORKER.execute(() -> {
             Account account = null;
             String error = null;

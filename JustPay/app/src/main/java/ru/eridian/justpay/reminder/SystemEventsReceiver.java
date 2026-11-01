@@ -4,10 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * Будильники пропадают после перезагрузки, смены часового пояса и обновления приложения,
- * поэтому в этих случаях напоминание заводится заново.
- */
+/** После перезагрузки и смены времени будильники пропадают, заводим заново */
 public class SystemEventsReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

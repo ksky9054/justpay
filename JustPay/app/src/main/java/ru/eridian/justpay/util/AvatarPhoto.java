@@ -18,11 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-/**
- * Фотография аватара. Выбирается системным окном выбора изображения (разрешения не нужны),
- * обрезается до квадрата, уменьшается и сохраняется в приватной папке приложения. Исходный файл
- * не копируется, данные съёмки (место, время) при перекодировании теряются. Фото не покидает телефон.
- */
+/** Фото аватара: обрезаем до квадрата, уменьшаем, храним в папке приложения */
 public final class AvatarPhoto {
     private AvatarPhoto() {}
 
@@ -38,7 +34,7 @@ public final class AvatarPhoto {
         return file(context, accountId).isFile();
     }
 
-    /** Сохранённое фото или null. */
+    /** Сохранённое фото или null */
     public static Bitmap load(Context context, long accountId) {
         File f = file(context, accountId);
         return f.isFile() ? BitmapFactory.decodeFile(f.getAbsolutePath()) : null;
@@ -49,7 +45,7 @@ public final class AvatarPhoto {
         if (f.exists()) f.delete();
     }
 
-    /** Обрабатывает выбранную картинку в фоне; onDone(true) в главном потоке, если фото сохранено. */
+    /** Обрабатывает картинку в фоне, onDone(true) если фото сохранено */
     public static void saveAsync(Context context, long accountId, Uri uri, Consumer<Boolean> onDone) {
         Context app = context.getApplicationContext();
         Handler main = new Handler(Looper.getMainLooper());
@@ -62,7 +58,7 @@ public final class AvatarPhoto {
     static boolean save(Context context, long accountId, Uri uri) {
         ContentResolver cr = context.getContentResolver();
         try {
-            // Сначала только размеры: гигантскую фотографию целиком в память не грузим
+            // Сначала читаем только размеры, чтобы не грузить огромное фото
             BitmapFactory.Options bounds = new BitmapFactory.Options();
             bounds.inJustDecodeBounds = true;
             try (InputStream in = cr.openInputStream(uri)) {
@@ -87,15 +83,15 @@ public final class AvatarPhoto {
                             ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                 }
             } catch (IOException ignored) {
-                // Без данных об ориентации просто берём картинку как есть
+                // Без ориентации берём как есть
             }
 
-            // Квадрат по центру (поворот не меняет центр квадрата), затем нужный размер
+            // Квадрат по центру и нужный размер
             int side = Math.min(src.getWidth(), src.getHeight());
             Bitmap square = Bitmap.createBitmap(src, (src.getWidth() - side) / 2, (src.getHeight() - side) / 2,
                     side, side, matrixFor(orientation), true);
             Bitmap out = Bitmap.createScaledBitmap(square, SIZE, SIZE, true);
-            // Большие промежуточные картинки больше не нужны: освобождаем память сразу
+            // Освобождаем память от промежуточных картинок
             if (square != src) src.recycle();
             if (out != square) square.recycle();
 
@@ -106,21 +102,21 @@ public final class AvatarPhoto {
             try (FileOutputStream os = new FileOutputStream(tmp)) {
                 if (!out.compress(Bitmap.CompressFormat.JPEG, QUALITY, os)) return false;
             }
-            // Заменяем старое фото только после того, как новое полностью записано
+            // Старое фото заменяем, когда новое записано
             return tmp.renameTo(target) || (target.delete() && tmp.renameTo(target));
         } catch (IOException | SecurityException | OutOfMemoryError e) {
             return false;
         }
     }
 
-    /** Во сколько раз уменьшить при чтении, чтобы короткая сторона осталась не меньше двух размеров аватара. */
+    /** Во сколько раз уменьшить при чтении */
     static int sampleSize(int width, int height) {
         int sample = 1;
         while (Math.min(width, height) / (sample * 2) >= SIZE * 2) sample *= 2;
         return sample;
     }
 
-    /** Матрица для поворота и отражения по значению ориентации EXIF. */
+    /** Матрица поворота по EXIF */
     static Matrix matrixFor(int orientation) {
         Matrix m = new Matrix();
         switch (orientation) {

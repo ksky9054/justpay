@@ -36,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:letterSpacing="-0.01"
+                android:fontFamily="@font/unbounded_medium"
                 android:text="JustPay"
                 android:textSize="20sp" />
         </LinearLayout>
@@ -249,6 +250,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:lineSpacingMultiplier="1.2"
-            android:text="Аккаунт хранится только на этом телефоне и никуда не отправляется. Пароль в базе лежит в виде хеша, поэтому восстановить его нельзя. Почта не проверяется." />
+            android:text="Аккаунт хранится только на телефоне." />
     </LinearLayout>
 </ScrollView>

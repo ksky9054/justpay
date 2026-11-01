@@ -18,10 +18,7 @@ import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.Account;
 import ru.eridian.justpay.data.AvatarSpec;
 
-/**
- * Выбор аватара: цвет, знак или фотография, с крупным предпросмотром.
- * Сохраняется кнопкой «Сохранить»; выбор и удаление фото выполняют переданные обработчики.
- */
+/** Выбор аватара: цвет, знак или фото */
 final class AvatarSheet {
     private AvatarSheet() {}
 
@@ -29,17 +26,12 @@ final class AvatarSheet {
         AvatarSpec spec;
     }
 
-    /**
-     * @param photo сохранённое фото аккаунта или null
-     * @param onPickPhoto открыть системный выбор картинки
-     * @param onDeletePhoto удалить сохранённое фото
-     */
     static void show(Activity a, Account account, Bitmap photo, Consumer<AvatarSpec> onSave,
                      Runnable onPickPhoto, Runnable onDeletePhoto) {
         View sheet = LayoutInflater.from(a).inflate(R.layout.sheet_avatar, null, false);
         State st = new State();
         st.spec = account.avatarSpec();
-        // Фото могли удалить файлом: тогда «Фото» нельзя оставить выбранным
+        // Фото могли удалить, тогда «Фото» не выбираем
         if (AvatarSpec.PHOTO.equals(st.spec.symbol) && photo == null) st.spec = st.spec.withSymbol(AvatarSpec.INITIALS);
 
         AvatarView preview = sheet.findViewById(R.id.av_preview);
@@ -56,7 +48,7 @@ final class AvatarSheet {
         Runnable refresh = () -> {
             preview.setAvatar(st.spec, initials, photo);
             caption.setText(AvatarSpec.SYMBOL_NAMES[AvatarSpec.indexOf(st.spec.symbol)]
-                    + (AvatarSpec.PHOTO.equals(st.spec.symbol) ? "" : " · " + AvatarSpec.COLOR_NAMES[st.spec.colorIndex]));
+                    + (AvatarSpec.PHOTO.equals(st.spec.symbol) ? "" : " - " + AvatarSpec.COLOR_NAMES[st.spec.colorIndex]));
             for (int i = 0; i < colorCells.length; i++) {
                 colorCells[i].setBackground(ring(a, i == st.spec.colorIndex));
             }
@@ -103,7 +95,7 @@ final class AvatarSheet {
             symbolTiles[i] = tile;
             cell.setOnClickListener(v -> {
                 if (AvatarSpec.PHOTO.equals(symbol) && photo == null) {
-                    // Фото ещё нет: закрываем шторку и открываем системный выбор картинки
+                    // Фото нет: закрываем шторку и открываем выбор
                     dialog[0].dismiss();
                     onPickPhoto.run();
                     return;
@@ -113,7 +105,7 @@ final class AvatarSheet {
             });
         }
 
-        // Действия с уже сохранённым фото
+        // Действия с фото
         sheet.findViewById(R.id.av_photo_actions).setVisibility(photo != null ? View.VISIBLE : View.GONE);
         sheet.findViewById(R.id.av_photo_change).setOnClickListener(v -> {
             dialog[0].dismiss();
@@ -133,7 +125,7 @@ final class AvatarSheet {
         dialog[0] = SheetDialog.show(a, sheet);
     }
 
-    /** Кольцо вокруг выбранного варианта. */
+    /** Кольцо у выбранного */
     private static GradientDrawable ring(Activity a, boolean selected) {
         GradientDrawable g = new GradientDrawable();
         g.setShape(GradientDrawable.OVAL);
