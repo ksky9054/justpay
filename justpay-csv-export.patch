@@ -1,0 +1,183 @@
+diff --git a/app/src/main/java/ru/eridian/justpay/ui/MainActivity.java b/app/src/main/java/ru/eridian/justpay/ui/MainActivity.java
+--- a/app/src/main/java/ru/eridian/justpay/ui/MainActivity.java
++++ b/app/src/main/java/ru/eridian/justpay/ui/MainActivity.java
+@@ -15,6 +15,8 @@
+     private static final String STATE_FILTER = "filter";
+     /** Код запроса системного выбора фото для аватара. */
+     static final int REQ_PHOTO = 41;
++    /** Код запроса для сохранения CSV-резервной копии подписок. */
++    static final int REQ_EXPORT = 42;
+     /** Какую вкладку открыть (из уведомления): 0 главная, 1 календарь, 2 аналитика, 3 профиль. */
+     public static final String EXTRA_TAB = "tab";
+ 
+@@ -115,6 +117,11 @@
+     @Override
+     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+         super.onActivityResult(requestCode, resultCode, data);
++        if (requestCode == REQ_EXPORT && resultCode == RESULT_OK && data != null
++                && data.getData() != null && profile != null) {
++            profile.onExportPicked(data.getData());
++            return;
++        }
+         if (requestCode == REQ_PHOTO && resultCode == RESULT_OK && data != null
+                 && data.getData() != null && profile != null) {
+             profile.onPhotoPicked(data.getData());
+diff --git a/app/src/main/java/ru/eridian/justpay/ui/ProfileTab.java b/app/src/main/java/ru/eridian/justpay/ui/ProfileTab.java
+--- a/app/src/main/java/ru/eridian/justpay/ui/ProfileTab.java
++++ b/app/src/main/java/ru/eridian/justpay/ui/ProfileTab.java
+@@ -27,6 +27,7 @@
+ import ru.eridian.justpay.usage.UsageAccess;
+ import ru.eridian.justpay.util.AvatarPhoto;
+ import ru.eridian.justpay.util.Fmt;
++import ru.eridian.justpay.util.SubscriptionCsvExporter;
+ 
+ /** Вкладка «Профиль»: аккаунт, тема, напоминания, доступ к статистике, способы оплаты. */
+ final class ProfileTab {
+@@ -94,11 +95,49 @@
+ 
+         screen.findViewById(R.id.usage_row).setOnClickListener(v ->
+                 a.startActivity(UsageAccess.settingsIntent(a)));
++        screen.findViewById(R.id.row_export).setOnClickListener(v -> exportSubscriptions());
+         screen.findViewById(R.id.row_onboarding).setOnClickListener(v ->
+                 a.startActivity(new Intent(a, OnboardingActivity.class)
+                         .putExtra(OnboardingActivity.EXTRA_REPLAY, true)));
+         screen.findViewById(R.id.row_logout).setOnClickListener(v -> signOut());
+         screen.findViewById(R.id.row_delete).setOnClickListener(v -> confirmDelete());
++    }
++
++
++    /** Предлагает пользователю выбрать место для CSV-файла через системный диалог Android. */
++    private void exportSubscriptions() {
++        List<Subscription> subscriptions = a.repo.all();
++        if (subscriptions.isEmpty()) {
++            Toaster.show(a, "Пока нечего экспортировать");
++            return;
++        }
++        String fileName = "justpay-subscriptions-" + java.time.LocalDate.now() + ".csv";
++        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
++                .addCategory(Intent.CATEGORY_OPENABLE)
++                .setType("text/csv")
++                .putExtra(Intent.EXTRA_TITLE, fileName);
++        try {
++            a.startActivityForResult(intent, MainActivity.REQ_EXPORT);
++        } catch (ActivityNotFoundException e) {
++            Toaster.show(a, "Не удалось открыть окно сохранения файла");
++        }
++    }
++
++    /** Записывает экспорт в выбранный пользователем документ; никаких файлов в общих папках нет. */
++    void onExportPicked(Uri uri) {
++        if (uri == null) return;
++        List<Subscription> subscriptions = a.repo.all();
++        Account account = AccountRepository.get(a).find(a.prefs.accountId());
++        Currency currency = account == null ? Currency.RUB : account.currencyValue();
++        String csv = SubscriptionCsvExporter.build(subscriptions, currency);
++        try (java.io.OutputStream output = a.getContentResolver().openOutputStream(uri, "wt")) {
++            if (output == null) throw new java.io.IOException("Не удалось открыть файл");
++            output.write(csv.getBytes(java.nio.charset.StandardCharsets.UTF_8));
++            output.flush();
++            Toaster.show(a, "Экспортировано подписок: " + subscriptions.size());
++        } catch (java.io.IOException | SecurityException e) {
++            Toaster.show(a, "Не удалось сохранить CSV-файл");
++        }
+     }
+ 
+     private void openAvatar() {
+diff --git a/app/src/main/java/ru/eridian/justpay/util/SubscriptionCsvExporter.java b/app/src/main/java/ru/eridian/justpay/util/SubscriptionCsvExporter.java
+new file mode 100644
+--- /dev/null
++++ b/app/src/main/java/ru/eridian/justpay/util/SubscriptionCsvExporter.java
+@@ -0,0 +1,64 @@
++package ru.eridian.justpay.util;
++
++import java.util.List;
++import java.util.Locale;
++
++import ru.eridian.justpay.data.Currency;
++import ru.eridian.justpay.data.Subscription;
++
++/** Формирует CSV-резервную копию списка подписок для экспорта из профиля. */
++public final class SubscriptionCsvExporter {
++    private SubscriptionCsvExporter() { }
++
++    public static String build(List<Subscription> subscriptions, Currency currency) {
++        StringBuilder csv = new StringBuilder();
++        // BOM помогает Excel корректно распознать UTF-8 и русские заголовки.
++        csv.append('\uFEFF');
++        csv.append("Название;Категория;Статус;Стоимость;Валюта;Период;Следующее списание;Способ оплаты\r\n");
++
++        for (Subscription subscription : subscriptions) {
++            appendRow(csv,
++                    safeText(subscription.name),
++                    safeText(subscription.category),
++                    subscription.isActive() ? "Активна" : "Приостановлена",
++                    String.format(Locale.US, "%.2f", subscription.price),
++                    currency.name(),
++                    cycleLabel(subscription.cycle),
++                    subscription.next == null ? "" : subscription.next.toString(),
++                    safeText(subscription.card));
++        }
++        return csv.toString();
++    }
++
++    private static String cycleLabel(String cycle) {
++        if (Subscription.CYCLE_WEEK.equals(cycle)) return "Еженедельно";
++        if (Subscription.CYCLE_YEAR.equals(cycle)) return "Ежегодно";
++        return "Ежемесячно";
++    }
++
++    private static void appendRow(StringBuilder csv, String... values) {
++        for (int i = 0; i < values.length; i++) {
++            if (i > 0) csv.append(';');
++            csv.append(escape(values[i]));
++        }
++        csv.append("\r\n");
++    }
++
++    /** Защита табличных редакторов от интерпретации пользовательского текста как формулы. */
++    private static String safeText(String value) {
++        if (value == null) return "";
++        int first = 0;
++        while (first < value.length() && Character.isWhitespace(value.charAt(first))) first++;
++        if (first < value.length() && "=+-@".indexOf(value.charAt(first)) >= 0) return "'" + value;
++        return value;
++    }
++
++    /** Экранирование по правилам CSV: кавычки удваиваются, поля с разделителем берутся в кавычки. */
++    private static String escape(String value) {
++        if (value == null) return "";
++        boolean quote = value.contains(";") || value.contains("\"")
++                || value.contains("\n") || value.contains("\r");
++        String escaped = value.replace("\"", "\"\"");
++        return quote ? "\"" + escaped + "\"" : escaped;
++    }
++}
+diff --git a/app/src/main/res/layout/screen_profile.xml b/app/src/main/res/layout/screen_profile.xml
+--- a/app/src/main/res/layout/screen_profile.xml
++++ b/app/src/main/res/layout/screen_profile.xml
+@@ -526,6 +526,25 @@
+             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
+ 
+             <LinearLayout
++                android:id="@+id/row_export"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:background="@drawable/d_row"
++                android:clickable="true"
++                android:focusable="true"
++                android:orientation="vertical"
++                android:padding="16dp">
++
++                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
++                    android:text="Экспортировать подписки" android:textSize="15sp" />
++                <TextView style="@style/Jp.Text" android:layout_width="match_parent" android:layout_height="wrap_content"
++                    android:layout_marginTop="4dp" android:text="Сохранить список подписок в CSV-файл, который можно открыть в таблицах."
++                    android:textColor="?attr/jpTx2" android:textSize="13sp" />
++            </LinearLayout>
++
++            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/jpLine" />
++
++            <LinearLayout
+                 android:id="@+id/row_onboarding"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"

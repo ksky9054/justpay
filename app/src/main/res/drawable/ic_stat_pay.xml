@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Значок для строки состояния: только форма, цвет подставит система. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="5"
+        android:pathData="M18,32a14,14 0 1,0 28,0a14,14 0 1,0 -28,0" />
+    <group android:rotation="-20" android:pivotX="32" android:pivotY="32">
+        <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5"
+            android:pathData="M4,32a28,9 0 1,0 56,0a28,9 0 1,0 -56,0" />
+    </group>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M51.8,22.4a6.5,6.5 0 1,0 13,0a6.5,6.5 0 1,0 -13,0" />
+</vector>

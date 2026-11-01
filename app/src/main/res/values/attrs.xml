@@ -1,0 +1,13 @@
+<resources>
+    <!-- Цвета темы: значения для тёмной и светлой темы заданы в themes.xml -->
+    <attr name="jpBg" format="color" />
+    <attr name="jpS1" format="color" />
+    <attr name="jpS2" format="color" />
+    <attr name="jpLine" format="color" />
+    <attr name="jpTx" format="color" />
+    <attr name="jpTx2" format="color" />
+    <attr name="jpTx3" format="color" />
+    <!-- Непрозрачный серый для значков: полупрозрачные штрихи темнеют в местах пересечения -->
+    <attr name="jpIconDim" format="color" />
+    <attr name="jpAct" format="color" />
+</resources>
