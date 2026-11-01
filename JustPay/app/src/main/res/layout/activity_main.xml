@@ -1337,40 +1337,6 @@
                 android:textSize="15sp" />
         </LinearLayout>
 
-        <!-- О приложении -->
-        <TextView
-            style="@style/Jp.Section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="О приложении" />
-
-        <LinearLayout
-            android:id="@+id/row_onboarding"
-            style="@style/Jp.Row"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/d_card_ripple"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true">
-
-            <TextView
-                style="@style/Jp.Semi"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Показать знакомство заново"
-                android:textSize="15sp" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="12dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_chevron_right" />
-        </LinearLayout>
-
         <!-- Документы -->
         <TextView
             style="@style/Jp.Section"
@@ -1456,6 +1422,40 @@
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_chevron_right" />
             </LinearLayout>
+        </LinearLayout>
+
+        <!-- О приложении -->
+        <TextView
+            style="@style/Jp.Section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="О приложении" />
+
+        <LinearLayout
+            android:id="@+id/row_onboarding"
+            style="@style/Jp.Row"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/d_card_ripple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                style="@style/Jp.Semi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Показать знакомство заново"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron_right" />
         </LinearLayout>
 
 
