@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Дневная статистика, таблица usage_days */
+/** Дневная статистика использования подписок (таблица usage_days). */
 public final class UsageRepository {
     private static UsageRepository instance;
 
@@ -25,7 +25,7 @@ public final class UsageRepository {
         return instance;
     }
 
-    /** Подписка принадлежит текущему аккаунту */
+    /** Подписка принадлежит аккаунту, в который выполнен вход. */
     private boolean owns(SQLiteDatabase db, long subId) {
         try (Cursor c = db.query(JustPayDbHelper.TABLE, new String[]{JustPayDbHelper.COL_ID},
                 JustPayDbHelper.COL_ID + " = ? AND " + JustPayDbHelper.COL_ACCOUNT + " = ?",
@@ -48,7 +48,7 @@ public final class UsageRepository {
         return out;
     }
 
-    /** Статистика всех подписок: id подписки -> дни */
+    /** Статистика всех подписок аккаунта: номер подписки -> дни. */
     public Map<Long, Map<LocalDate, UsageDay>> allForAccount() {
         Map<Long, Map<LocalDate, UsageDay>> out = new HashMap<>();
         if (prefs.accountId() <= 0) return out;
@@ -71,7 +71,10 @@ public final class UsageRepository {
         return out;
     }
 
-    /** Меняет число отметок за день на delta, возвращает новое или -1 */
+    /**
+     * Меняет число ручных отметок за день на delta (но не ниже нуля).
+     * Возвращает новое число отметок или -1, если подписка чужая.
+     */
     public int addManual(long subId, LocalDate day, int delta) {
         SQLiteDatabase db = helper.getWritableDatabase();
         if (!owns(db, subId)) return -1;
@@ -87,7 +90,7 @@ public final class UsageRepository {
         }
     }
 
-    /** Записывает данные приложения за день */
+    /** Записывает данные приложения за день, полученные из статистики телефона. */
     public void saveAuto(long subId, LocalDate day, int opens, int seconds) {
         SQLiteDatabase db = helper.getWritableDatabase();
         if (!owns(db, subId)) return;
@@ -98,7 +101,7 @@ public final class UsageRepository {
                 new Object[]{opens, seconds, subId, day.toString()});
     }
 
-    /** Сбрасывает данные приложения, отметки остаются */
+    /** Сбрасывает данные приложения (при отвязке), ручные отметки остаются. */
     public void clearAuto(long subId) {
         SQLiteDatabase db = helper.getWritableDatabase();
         if (!owns(db, subId)) return;

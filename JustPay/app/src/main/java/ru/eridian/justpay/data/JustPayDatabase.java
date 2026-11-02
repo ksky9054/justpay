@@ -2,7 +2,7 @@ package ru.eridian.justpay.data;
 
 import android.content.Context;
 
-/** Один помощник базы на всё приложение */
+/** Один общий помощник базы на всё приложение. */
 final class JustPayDatabase {
     private JustPayDatabase() {}
 

@@ -14,7 +14,7 @@ import android.view.WindowManager;
 
 import ru.eridian.justpay.R;
 
-/** Общая шторка снизу: затемнение, отступ под жесты */
+/** Общая оболочка нижней шторки: затемнение, прижатие к низу, отступ под жесты навигации. */
 final class SheetDialog {
     private SheetDialog() {}
 

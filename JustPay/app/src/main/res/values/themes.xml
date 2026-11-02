@@ -1,24 +1,19 @@
 <resources>
 
     <style name="Base.Theme.JustPay.Dark" parent="android:Theme.Material.NoActionBar">
-        <item name="jpBg">#000000</item>
-        <item name="jpS1">#121212</item>
-        <item name="jpS2">#1C1C1E</item>
+        <item name="jpBg">#0D0E11</item>
+        <item name="jpS1">#17181C</item>
+        <item name="jpS2">#222328</item>
         <item name="jpLine">#12FFFFFF</item>
-        <item name="jpTx">#F8FAFC</item>
-        <item name="jpTx2">#94A3B8</item>
-        <item name="jpTx3">#6F7B8F</item>
-        <item name="jpIconDim">#6E7686</item>
-        <item name="jpThumb">#FFFFFF</item>
-        <item name="jpAcFill">#8B9BFF</item>
-        <item name="jpAcTextDark">#8B9BFF</item>
-        <item name="jpAcTextLight">#4A55A8</item>
-        <item name="jpAc">?attr/jpAcFill</item>
-        <item name="jpAct">?attr/jpAcTextDark</item>
-        <item name="android:windowBackground">#000000</item>
-        <item name="android:textColorPrimary">#F8FAFC</item>
-        <item name="android:textColorHint">#6F7B8F</item>
-        <item name="android:colorAccent">?attr/jpAcFill</item>
+        <item name="jpTx">#F3F3F1</item>
+        <item name="jpTx2">#A3F3F3F1</item>
+        <item name="jpTx3">#66F3F3F1</item>
+        <item name="jpIconDim">#696A69</item>
+        <item name="jpAct">#8B9BFF</item>
+        <item name="android:windowBackground">#0D0E11</item>
+        <item name="android:textColorPrimary">#F3F3F1</item>
+        <item name="android:textColorHint">#66F3F3F1</item>
+        <item name="android:colorAccent">@color/jp_ac</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
@@ -33,59 +28,17 @@
         <item name="jpTx2">#9E111216</item>
         <item name="jpTx3">#6B111216</item>
         <item name="jpIconDim">#939494</item>
-        <item name="jpThumb">#0D0E11</item>
-        <item name="jpAcFill">#8B9BFF</item>
-        <item name="jpAcTextDark">#8B9BFF</item>
-        <item name="jpAcTextLight">#4A55A8</item>
-        <item name="jpAc">?attr/jpAcFill</item>
-        <item name="jpAct">?attr/jpAcTextLight</item>
+        <item name="jpAct">#4A55A8</item>
         <item name="android:windowBackground">#F2F2EF</item>
         <item name="android:textColorPrimary">#111216</item>
         <item name="android:textColorHint">#6B111216</item>
-        <item name="android:colorAccent">?attr/jpAcTextLight</item>
+        <item name="android:colorAccent">#4A55A8</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <!-- Цвета акцента, накладываются на тему -->
-    <style name="Jp.Accent.Lavender" parent="">
-        <item name="jpAcFill">#8B9BFF</item>
-        <item name="jpAcTextDark">#8B9BFF</item>
-        <item name="jpAcTextLight">#4A55A8</item>
-    </style>
-    <style name="Jp.Accent.Violet" parent="">
-        <item name="jpAcFill">#CDBDFF</item>
-        <item name="jpAcTextDark">#CDBDFF</item>
-        <item name="jpAcTextLight">#63568F</item>
-    </style>
-    <style name="Jp.Accent.Sky" parent="">
-        <item name="jpAcFill">#98CCF9</item>
-        <item name="jpAcTextDark">#98CCF9</item>
-        <item name="jpAcTextLight">#2A638A</item>
-    </style>
-    <style name="Jp.Accent.Mint" parent="">
-        <item name="jpAcFill">#8DD5B2</item>
-        <item name="jpAcTextDark">#8DD5B2</item>
-        <item name="jpAcTextLight">#206A4E</item>
-    </style>
-    <style name="Jp.Accent.Lime" parent="">
-        <item name="jpAcFill">#B9CF83</item>
-        <item name="jpAcTextDark">#B9CF83</item>
-        <item name="jpAcTextLight">#536525</item>
-    </style>
-    <style name="Jp.Accent.Amber" parent="">
-        <item name="jpAcFill">#F9BB72</item>
-        <item name="jpAcTextDark">#F9BB72</item>
-        <item name="jpAcTextLight">#835414</item>
-    </style>
-    <style name="Jp.Accent.Rose" parent="">
-        <item name="jpAcFill">#FEB0D2</item>
-        <item name="jpAcTextDark">#FEB0D2</item>
-        <item name="jpAcTextLight">#894A68</item>
-    </style>
-
-    <!-- Итоговые темы, на новых Android дополняются в values-v27 и v29 -->
+    <!-- Итоговые темы. На новых версиях Android дополняются в values-v27 и values-v29. -->
     <style name="Theme.JustPay.Dark" parent="Base.Theme.JustPay.Dark" />
     <style name="Theme.JustPay.Light" parent="Base.Theme.JustPay.Light" />
 
@@ -93,17 +46,17 @@
     <style name="Jp.Text" parent="">
         <item name="android:textColor">?attr/jpTx</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:fontFamily">@font/plex_regular</item>
+        <item name="android:fontFamily">@font/manrope_regular</item>
     </style>
     <style name="Jp.Semi" parent="Jp.Text">
-        <item name="android:fontFamily">@font/plex_semibold</item>
+        <item name="android:fontFamily">@font/manrope_semibold</item>
     </style>
     <style name="Jp.Bold" parent="Jp.Text">
-        <item name="android:fontFamily">@font/plex_bold</item>
+        <item name="android:fontFamily">@font/manrope_bold</item>
     </style>
-    <!-- Шрифт цифр и заголовков (Unbounded) -->
+    <!-- Шрифт акцидентных цифр и заголовков (в дизайне Unbounded) -->
     <style name="Jp.Disp" parent="Jp.Text">
-        <item name="android:fontFamily">@font/exo_bold</item>
+        <item name="android:fontFamily">@font/unbounded_medium</item>
     </style>
     <style name="Jp.Label" parent="Jp.Semi">
         <item name="android:textColor">?attr/jpTx2</item>
@@ -130,6 +83,7 @@
     <style name="Jp.Card" parent="">
         <item name="android:orientation">vertical</item>
         <item name="android:background">@drawable/d_card</item>
+        <item name="android:clipToOutline">true</item>
     </style>
     <style name="Jp.Card.Divided" parent="Jp.Card">
         <item name="android:divider">@drawable/d_divider</item>
@@ -150,7 +104,7 @@
         <item name="android:background">?attr/jpLine</item>
     </style>
 
-    <!-- Кнопки -->
+    <!-- Кнопки (TextView: без стандартных отступов и тени Button) -->
     <style name="Jp.Btn" parent="Jp.Bold">
         <item name="android:gravity">center</item>
         <item name="android:clickable">true</item>
@@ -227,16 +181,5 @@
     <style name="Jp.SheetAnim" parent="android:Animation">
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
-    </style>
-    <!-- Флажок согласия -->
-    <style name="Jp.Check" parent="">
-        <item name="android:button">@drawable/d_check</item>
-        <item name="android:fontFamily">@font/plex_regular</item>
-        <item name="android:textColor">?attr/jpTx2</item>
-        <item name="android:textSize">13sp</item>
-        <item name="android:lineSpacingMultiplier">1.15</item>
-        <item name="android:paddingStart">10dp</item>
-        <item name="android:paddingTop">6dp</item>
-        <item name="android:paddingBottom">6dp</item>
     </style>
 </resources>

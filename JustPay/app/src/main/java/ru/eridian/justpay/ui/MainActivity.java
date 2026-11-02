@@ -3,26 +3,26 @@ package ru.eridian.justpay.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ScrollView;
 
 import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.AccountRepository;
 import ru.eridian.justpay.reminder.ReminderScheduler;
 import ru.eridian.justpay.usage.UsageSync;
 
-/** Главный экран с четырьмя вкладками */
+/** Главный экран с четырьмя вкладками: список, календарь, аналитика, профиль. */
 public class MainActivity extends BaseActivity {
     private static final String STATE_TAB = "tab";
     private static final String STATE_FILTER = "filter";
-    /** Код запроса выбора фото */
+    /** Код запроса системного выбора фото для аватара. */
     static final int REQ_PHOTO = 41;
-    /** Вкладка из уведомления: 0 главная, 1 календарь, 2 аналитика, 3 профиль */
+    /** Код запроса системного диалога сохранения CSV. */
+    static final int REQ_EXPORT = 42;
+    /** Какую вкладку открыть (из уведомления): 0 главная, 1 календарь, 2 аналитика, 3 профиль. */
     public static final String EXTRA_TAB = "tab";
 
     private View[] screens;
     private View[] navs;
     private View fab;
-    private BlurBar blurBar;
     private int tab = 0;
 
     private HomeTab home;
@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity {
             finish();
             return;
         }
-        // Без входа данных нет, сначала вход
+        // Без входа в аккаунт данных нет: сначала экран входа (или регистрации)
         if (!prefs.isSignedIn() || AccountRepository.get(this).find(prefs.accountId()) == null) {
             prefs.clearAccount();
             startActivity(new Intent(this, AuthActivity.class));
@@ -64,13 +64,6 @@ public class MainActivity extends BaseActivity {
             navs[i].setOnClickListener(v -> selectTab(index));
         }
 
-        blurBar = findViewById(R.id.blur_bar);
-        blurBar.setSource(findViewById(R.id.content));
-        // При прокрутке размытие под панелью нужно перерисовать
-        for (View screen : screens) {
-            ((ScrollView) screen).setOnScrollChangeListener((v, x, y, oldX, oldY) -> blurBar.invalidate());
-        }
-
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> openEdit(0));
 
@@ -87,7 +80,7 @@ public class MainActivity extends BaseActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        // Нажали уведомление при открытом приложении
+        // Приложение уже открыто, а пользователь нажал уведомление: переходим на нужную вкладку
         if (screens != null && intent.hasExtra(EXTRA_TAB)) selectTab(clampTab(intent.getIntExtra(EXTRA_TAB, 0)));
     }
 
@@ -102,13 +95,13 @@ public class MainActivity extends BaseActivity {
         repo.rollForward(today());
         ReminderScheduler.reschedule(this);
         if (!prefs.notifPermissionAsked()) {
-            // Один раз просим разрешение на уведомления
+            // Один раз объясняем необходимость разрешения системным окном при первом запуске
             prefs.setNotifPermissionAsked(true);
             requestNotificationPermission();
         }
         refreshAll();
         Toaster.flush(this);
-        // Статистика читается в фоне, потом обновляем экраны
+        // Статистика из приложений сервисов читается в фоне и обновляет экраны, когда готова
         UsageSync.syncAsync(this, () -> runOnUiThread(() -> {
             if (!isFinishing() && !isDestroyed()) stats.refresh();
         }));
@@ -119,7 +112,6 @@ public class MainActivity extends BaseActivity {
         calendar.refresh();
         stats.refresh();
         profile.refresh();
-        if (blurBar != null) blurBar.invalidate();
     }
 
     @Override
@@ -128,6 +120,10 @@ public class MainActivity extends BaseActivity {
         if (requestCode == REQ_PHOTO && resultCode == RESULT_OK && data != null
                 && data.getData() != null && profile != null) {
             profile.onPhotoPicked(data.getData());
+        }
+        if (requestCode == REQ_EXPORT && resultCode == RESULT_OK && data != null
+                && data.getData() != null && profile != null) {
+            profile.onExportPicked(data.getData());
         }
     }
 
@@ -145,6 +141,6 @@ public class MainActivity extends BaseActivity {
             screens[i].setVisibility(i == index ? View.VISIBLE : View.GONE);
             navs[i].setSelected(i == index);
         }
-        if (blurBar != null) blurBar.invalidate();
+        fab.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
     }
 }

@@ -27,6 +27,5 @@ android {
 }
 
 dependencies {
-    // Только для автотестов, в само приложение библиотека не попадает
     testImplementation 'junit:junit:4.13.2'
 }

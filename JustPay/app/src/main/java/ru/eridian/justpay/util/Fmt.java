@@ -5,7 +5,7 @@ import java.time.temporal.ChronoUnit;
 
 import ru.eridian.justpay.data.Currency;
 
-/** Форматирование сумм, дат и склонений */
+/** Форматирование сумм, дат и склонений по-русски. */
 public final class Fmt {
     private Fmt() {}
 
@@ -16,7 +16,7 @@ public final class Fmt {
     // индекс = DayOfWeek.getValue() % 7, воскресенье = 0
     private static final String[] WD = {"воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"};
 
-    /** 12345.6 -> «12 346» */
+    /** 12345.6 -> «12 346» с неразрывными пробелами между разрядами. */
     public static String num(double n) {
         String s = String.valueOf(Math.abs(Math.round(n)));
         StringBuilder sb = new StringBuilder();
@@ -29,9 +29,11 @@ public final class Fmt {
         return sb.toString();
     }
 
+    // ----- деньги в валюте аккаунта -----
+
     private static Currency currency = Currency.RUB;
 
-    /** Текущая валюта (аккаунта) */
+    /** Валюта, в которой сейчас показываются все суммы (валюта аккаунта, в который выполнен вход). */
     public static void setCurrency(Currency c) {
         currency = c == null ? Currency.RUB : c;
     }
@@ -44,7 +46,7 @@ public final class Fmt {
         return currency.symbol;
     }
 
-    /** 1234.5 -> «1 234,50», 399 -> «399» */
+    /** 1234.5 -> «1 234,50», 399 -> «399»: копейки видны, только если они есть. */
     public static String decimals(double n) {
         double r = Math.round(n * 100) / 100.0;
         if (Math.abs(r - Math.rint(r)) < 0.005) return num(r);
@@ -53,22 +55,22 @@ public final class Fmt {
         return (r < 0 ? "-" : "") + num((double) (cents / 100)) + "," + (frac < 10 ? "0" : "") + frac;
     }
 
-    /** Число для итогов: рубль без копеек, остальные с копейками */
+    /** Число для итоговых сумм: целое для рубля и тенге, с копейками для остальных валют. */
     public static String moneyNum(double n) {
         return currency.digits == 0 ? num(n) : decimals(n);
     }
 
-    /** Итог с обозначением валюты */
+    /** Итоговая сумма (в месяц, в год и т. п.) с обозначением валюты. */
     public static String money(double n) {
         return moneyNum(n) + NBSP + currency.symbol;
     }
 
-    /** Сумма в заданной валюте */
+    /** Сумма в указанной валюте, а не в текущей (нужно для примера пересчёта). */
     public static String priceIn(Currency c, double n) {
         return decimals(n) + NBSP + c.symbol;
     }
 
-    /** Цена как её ввёл пользователь */
+    /** Цена подписки так, как её ввёл пользователь: копейки показываются, если они есть. */
     public static String price(double n) {
         return decimals(n) + NBSP + currency.symbol;
     }
@@ -113,7 +115,7 @@ public final class Fmt {
         return MN[d.getMonthValue() - 1] + " " + d.getYear();
     }
 
-    /** 3725 с -> «1 ч 2 мин» */
+    /** 3725 с -> «1 ч 2 мин»; меньше минуты -> «менее мин». */
     public static String duration(int seconds) {
         int minutes = seconds / 60;
         if (minutes < 1) return "< 1 мин";

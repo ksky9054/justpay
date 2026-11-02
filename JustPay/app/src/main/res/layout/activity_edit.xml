@@ -132,7 +132,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/exo_bold"
+                    android:fontFamily="@font/unbounded_medium"
                     android:hint="0"
                     android:imeOptions="actionDone"
                     android:inputType="numberDecimal"
@@ -346,7 +346,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:paddingStart="4dp"
-                    android:text="Только название, без номера карты." />
+                    android:text="Только название. Номер карты вводить не нужно." />
             </LinearLayout>
 
             <!-- Предпросмотр расчёта -->

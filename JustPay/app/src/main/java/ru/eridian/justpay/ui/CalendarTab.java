@@ -18,7 +18,7 @@ import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.util.Fmt;
 
-/** Вкладка «Календарь»: списания по дням */
+/** Вкладка «Календарь»: списания по дням на ближайшие шесть месяцев. */
 final class CalendarTab {
     private static final int MONTHS_AHEAD = 5;
     private static final String[] WEEKDAYS = {"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"};
@@ -30,7 +30,7 @@ final class CalendarTab {
     private final LinearLayout list;
 
     private int monthOffset = 0;
-    /** Выбранный день для своего месяца */
+    /** Выбранный день; применяется только к тому месяцу, для которого выбран. */
     private int selectedDay = -1;
     private int selectedMonthOffset = -1;
 
@@ -53,7 +53,7 @@ final class CalendarTab {
             t.setGravity(android.view.Gravity.CENTER);
             t.setTextSize(12);
             t.setTextColor(Ui.attr(a, R.attr.jpTx3));
-            t.setTypeface(a.getResources().getFont(R.font.plex_semibold));
+            t.setTypeface(a.getResources().getFont(R.font.manrope_semibold));
             weekdays.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         }
 
@@ -83,7 +83,7 @@ final class CalendarTab {
             if (Subscription.CYCLE_MONTH.equals(s.cycle)) {
                 int day = Math.min(nd.getDayOfMonth(), dim);
                 LocalDate dt = LocalDate.of(y, m, day);
-                // В будущем месяце до ближайшего списания ещё не списывали
+                // До даты ближайшего списания в будущем месяце ещё не списывали
                 if (!(!dt.isBefore(today) && dt.isBefore(nd))) add(occ, day, s);
             } else if (Subscription.CYCLE_YEAR.equals(s.cycle)) {
                 if (nd.getMonthValue() == m && nd.getYear() == y) add(occ, nd.getDayOfMonth(), s);
@@ -98,7 +98,7 @@ final class CalendarTab {
             }
         }
 
-        // Выбран сохранённый день, иначе ближайший с платежом
+        // Какой день выбран: сохранённый для этого месяца, иначе ближайший с платежом
         List<Integer> days = new ArrayList<>(occ.keySet());
         java.util.Collections.sort(days);
         int sel;
@@ -141,12 +141,13 @@ final class CalendarTab {
                 Subscription s = items.get(i);
                 View row = inflater.inflate(R.layout.item_sub_row, list, false);
                 row.findViewById(R.id.divider).setVisibility(i == 0 ? View.GONE : View.VISIBLE);
+                ((TextView) row.findViewById(R.id.mk)).setText(s.mark);
                 ((TextView) row.findViewById(R.id.name)).setText(s.name);
                 ((TextView) row.findViewById(R.id.price)).setText(Fmt.price(s.price));
                 View cyc = row.findViewById(R.id.cyc);
                 if (cyc != null) cyc.setVisibility(View.GONE);
                 ((TextView) row.findViewById(R.id.line)).setText(
-                        (past ? "Списано" : "Запланировано") + (s.hasCard() ? " - " + s.card : ""));
+                        (past ? "Списано" : "Запланировано") + (s.hasCard() ? " · " + s.card : ""));
                 row.findViewById(R.id.row).setOnClickListener(v -> a.openDetail(s.id));
                 list.addView(row);
             }
@@ -169,7 +170,7 @@ final class CalendarTab {
         int lead = first.getDayOfWeek().getValue() - 1; // понедельник = 0
         int dim = first.lengthOfMonth();
         int ink = a.getColor(R.color.jp_ink);
-        int ac = Ui.attr(a, R.attr.jpAc);
+        int ac = a.getColor(R.color.jp_ac);
         int tx = Ui.attr(a, R.attr.jpTx);
         int tx3 = Ui.attr(a, R.attr.jpTx3);
         int act = Ui.attr(a, R.attr.jpAct);

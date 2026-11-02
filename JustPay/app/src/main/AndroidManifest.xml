@@ -2,17 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Работает офлайн, данные в SQLite на телефоне -->
+    <!-- Приложение работает офлайн, данные лежат в SQLite на устройстве. Разрешения нужны только
+         для напоминаний и учёта активности: показать уведомление, заново завести будильник
+         после перезагрузки и прочитать статистику использования приложений, которые пользователь
+         сам привязал к подпискам. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- Сеть нужна только для курса валют при смене валюты -->
+    <!-- Сеть нужна только для курса валют при смене валюты аккаунта (Банк России). Без неё
+         всё остальное работает. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Особый доступ, пользователь включает сам -->
+    <!-- Особый доступ: пользователь включает его вручную в настройках Android -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
 
-    <!-- Видеть приложения с значком запуска, чтобы выбрать сервис -->
+    <!-- Видеть приложения с значком запуска, чтобы пользователь мог выбрать приложение сервиса
+         (без широкого разрешения QUERY_ALL_PACKAGES) -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -48,11 +53,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.NotificationsActivity" android:exported="false" />
-        <activity android:name=".ui.LegalActivity" android:exported="false" />
 
-        <!-- Сигнал будильника только от самого приложения -->
+        <!-- Будильник напоминания: приходит только от самого приложения -->
         <receiver android:name=".reminder.ReminderReceiver" android:exported="false" />
-        <!-- События, после которых будильник заводим заново -->
+        <!-- Системные события, после которых будильник заводится заново -->
         <receiver android:name=".reminder.SystemEventsReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

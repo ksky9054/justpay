@@ -2,7 +2,7 @@ package ru.eridian.justpay.data;
 
 import java.time.LocalDate;
 
-/** Подписка, строка таблицы subscriptions */
+/** Запись о подписке: то, что хранится в таблице subscriptions. */
 public class Subscription {
     public static final String ACTIVE = "active";
     public static final String PAUSED = "paused";
@@ -13,24 +13,28 @@ public class Subscription {
 
     public long id;
     public String name;
-    /** Две буквы названия */
+    /** Две буквы для плитки в списке. */
     public String mark;
     public double price;
     public String cycle = CYCLE_MONTH;
-    /** Следующее списание, у паузы его нет */
+    /** Дата следующего списания; у подписки на паузе её нет. */
     public LocalDate next;
-    /** Последнее списание перед паузой */
+    /** Дата последнего списания перед паузой. */
     public LocalDate prev;
     public String category;
     public String status = ACTIVE;
-    /** Способ оплаты, например «Основная карта» */
+    /** Подпись способа оплаты, например «Основная карта». Номер карты вводить не нужно. */
     public String card = "";
     public String since;
     public long accountId;
-    /** Приложение сервиса, откуда берём статистику, или null */
+    /** Приложение сервиса на телефоне, из активности которого берётся статистика, или null. */
     public String appPackage;
     public LocalDate createdAt = LocalDate.now();
-    /** Когда напомнить: дней до списания, REMIND_DEFAULT или REMIND_OFF */
+    /**
+     * Когда напоминать: за сколько дней до списания (0 и больше), либо REMIND_DEFAULT
+     * (как в настройках профиля), либо REMIND_OFF (не напоминать). Хранится смещение, а не
+     * дата, поэтому напоминание само переезжает вместе с датой следующего списания.
+     */
     public int remindDays = REMIND_DEFAULT;
 
     public static final int REMIND_DEFAULT = -1;
@@ -44,20 +48,20 @@ public class Subscription {
         return card != null && !card.trim().isEmpty();
     }
 
-    /** Дней до списания или REMIND_OFF */
+    /** Фактическое число дней до списания или REMIND_OFF, если напоминать не нужно. */
     public int effectiveRemindDays(Prefs prefs) {
         if (remindDays == REMIND_DEFAULT) return prefs.isRemind() ? prefs.remindDays() : REMIND_OFF;
         return remindDays;
     }
 
-    /** Дата напоминания или null */
+    /** Дата напоминания или null: подписка на паузе либо напоминания выключены. */
     public LocalDate remindDate(Prefs prefs) {
         if (!isActive() || next == null) return null;
         int days = effectiveRemindDays(prefs);
         return days == REMIND_OFF ? null : next.minusDays(days);
     }
 
-    /** Цена в месяц: год делим на 12, неделю умножаем на 52/12 */
+    /** Сколько подписка стоит в месяц: год делится на 12, неделя умножается на 52/12. */
     public double monthly() {
         return monthly(price, cycle);
     }
@@ -68,14 +72,17 @@ public class Subscription {
         return price;
     }
 
-    /** Сдвигает дату на k периодов */
+    /** Сдвигает дату на k периодов (k может быть отрицательным). */
     public static LocalDate shift(LocalDate base, String cycle, int k) {
         if (CYCLE_YEAR.equals(cycle)) return base.plusYears(k);
         if (CYCLE_WEEK.equals(cycle)) return base.plusWeeks(k);
         return base.plusMonths(k);
     }
 
-    /** Первая дата списания после today (с inclusive и сама today) */
+    /**
+     * Первая дата списания от base с шагом в один период, которая позже today
+     * (или не раньше today, если inclusive).
+     */
     public static LocalDate advance(LocalDate base, String cycle, LocalDate today, boolean inclusive) {
         LocalDate d = base;
         int k = 0;

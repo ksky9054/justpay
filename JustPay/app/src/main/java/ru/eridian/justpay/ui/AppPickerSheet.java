@@ -20,7 +20,7 @@ import java.util.List;
 import ru.eridian.justpay.R;
 import ru.eridian.justpay.usage.AppCatalog;
 
-/** Шторка со списком приложений для привязки к подписке */
+/** Нижняя шторка со списком установленных приложений для привязки к подписке. */
 public final class AppPickerSheet {
     private AppPickerSheet() {}
 
@@ -36,8 +36,8 @@ public final class AppPickerSheet {
 
         TextView sub = sheet.findViewById(R.id.ap_sub);
         sub.setText(apps.isEmpty()
-                ? "Приложений не найдено."
-                : "Выберите приложение «" + subscriptionName + "». Будем считать его открытия.");
+                ? "На телефоне не нашлось приложений для выбора."
+                : "Выберите приложение «" + subscriptionName + "». JustPay будет считать, сколько раз вы его открываете.");
 
         ListView list = sheet.findViewById(R.id.ap_list);
         list.setAdapter(new ArrayAdapter<AppCatalog.AppInfo>(a, 0, apps) {

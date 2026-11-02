@@ -8,7 +8,10 @@ import android.os.Build;
 import android.os.Process;
 import android.provider.Settings;
 
-/** Доступ к статистике: особое разрешение, пользователь включает его сам */
+/**
+ * Доступ к статистике использования приложений. Это особое разрешение Android: его нельзя
+ * запросить окном, пользователь включает его сам в системных настройках.
+ */
 public final class UsageAccess {
     private UsageAccess() {}
 
@@ -22,7 +25,7 @@ public final class UsageAccess {
         return mode == AppOpsManager.MODE_ALLOWED;
     }
 
-    /** Системные настройки доступа */
+    /** Экран системных настроек, где включается доступ (на новых версиях сразу для JustPay). */
     public static Intent settingsIntent(Context context) {
         Intent i = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
         if (Build.VERSION.SDK_INT >= 29) i.setData(Uri.parse("package:" + context.getPackageName()));

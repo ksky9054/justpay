@@ -8,25 +8,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-/** Расчёты по статистике: серия, число использований, цена одного */
+/**
+ * Расчёты по статистике: серия дней подряд, число использований, стоимость одного использования.
+ * Класс не зависит от Android, поэтому его можно проверять обычным запуском Java.
+ */
 public final class UsageMetrics {
     private UsageMetrics() {}
 
-    /** Дни, когда пользовались подпиской */
+    /** Дни, в которые подпиской пользовались. */
     public static Set<LocalDate> activeDays(Map<LocalDate, UsageDay> days) {
         Set<LocalDate> out = new TreeSet<>();
         for (UsageDay d : days.values()) if (d.isActive()) out.add(d.day);
         return out;
     }
 
-    /** Дни, когда пользовались любой подпиской */
+    /** Дни, в которые пользовались хотя бы одной из подписок. */
     public static Set<LocalDate> activeDaysAny(Collection<Map<LocalDate, UsageDay>> all) {
         Set<LocalDate> out = new TreeSet<>();
         for (Map<LocalDate, UsageDay> m : all) out.addAll(activeDays(m));
         return out;
     }
 
-    /** Серия дней подряд; если сегодня отметки нет, считаем от вчера */
+    /**
+     * Текущая серия: сколько дней подряд была активность. Если сегодня отметки ещё нет,
+     * серия не обрывается и считается от вчерашнего дня, как в Duolingo: у пользователя
+     * есть весь сегодняшний день, чтобы её продолжить.
+     */
     public static int currentStreak(Set<LocalDate> active, LocalDate today) {
         LocalDate d = active.contains(today) ? today : today.minusDays(1);
         int n = 0;
@@ -37,7 +44,7 @@ public final class UsageMetrics {
         return n;
     }
 
-    /** Самая длинная серия */
+    /** Самая длинная серия за всё время. */
     public static int longestStreak(Set<LocalDate> active) {
         int best = 0, run = 0;
         LocalDate prev = null;
@@ -49,14 +56,14 @@ public final class UsageMetrics {
         return best;
     }
 
-    /** Использований за n дней */
+    /** Использований за последние n дней, включая сегодня. */
     public static int usesInLast(Map<LocalDate, UsageDay> days, int n, LocalDate today) {
         int sum = 0;
         for (UsageDay d : days.values()) if (inWindow(d.day, n, today)) sum += d.uses();
         return sum;
     }
 
-    /** Секунд в приложении за n дней */
+    /** Время в приложении за последние n дней, секунды. */
     public static int secondsInLast(Map<LocalDate, UsageDay> days, int n, LocalDate today) {
         int sum = 0;
         for (UsageDay d : days.values()) if (inWindow(d.day, n, today)) sum += d.seconds;
@@ -67,21 +74,21 @@ public final class UsageMetrics {
         return !d.isAfter(today) && d.isAfter(today.minusDays(n));
     }
 
-    /** Последний день с активностью или null */
+    /** Последний день с активностью или null, если её ещё не было. */
     public static LocalDate lastUse(Set<LocalDate> active) {
         LocalDate last = null;
         for (LocalDate d : active) if (last == null || d.isAfter(last)) last = d;
         return last;
     }
 
-    /** Последние 7 дней, последний элемент - сегодня */
+    /** Активность за последние 7 дней: первый элемент — шесть дней назад, последний — сегодня. */
     public static List<Boolean> lastWeek(Set<LocalDate> active, LocalDate today) {
         List<Boolean> out = new ArrayList<>();
         for (int i = 6; i >= 0; i--) out.add(active.contains(today.minusDays(i)));
         return out;
     }
 
-    /** Цена одного использования за месяц или -1 */
+    /** Во сколько обходится одно использование за месяц, или -1, если использований не было. */
     public static double costPerUse(double monthlyPrice, int usesIn30Days) {
         return usesIn30Days <= 0 ? -1 : monthlyPrice / usesIn30Days;
     }

@@ -43,7 +43,7 @@
                 android:paddingTop="6dp"
                 android:paddingEnd="20dp"
                 android:paddingBottom="10dp"
-                android:text="Суммы вводятся и показываются в этой валюте."
+                android:text="Все суммы в аккаунте вводятся и показываются в этой валюте. Если есть интернет, цены подписок пересчитаются по курсу Банка России. Без интернета пересчёт не работает: тогда цены останутся прежними числами."
                 android:textColor="?attr/jpTx2"
                 android:textSize="13sp" />
 

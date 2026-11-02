@@ -30,7 +30,15 @@ import ru.eridian.justpay.ui.MainActivity;
 import ru.eridian.justpay.usage.UsageSync;
 import ru.eridian.justpay.util.Fmt;
 
-/** Два напоминания: вечером про серию и раз в неделю про неиспользуемые подписки */
+/**
+ * Два напоминания об активности:
+ * <ul>
+ *   <li>вечером (20:00), если сегодня нет ни одной отметки и серию ещё можно потерять;</li>
+ *   <li>раз в неделю в 12:00 о подписках, которыми не пользуются больше двух недель.</li>
+ * </ul>
+ * Условия проверяются в момент срабатывания, а не при планировании: к вечеру отметка могла появиться.
+ * Для каждого напоминания свой неточный будильник; после срабатывания он ставится на следующий день.
+ */
 public final class ActivityReminders {
     public static final String ACTION_STREAK = "ru.eridian.justpay.action.STREAK";
     public static final String ACTION_IDLE = "ru.eridian.justpay.action.IDLE";
@@ -45,12 +53,12 @@ public final class ActivityReminders {
     private static final int STREAK_LATE_UNTIL = 23;
     private static final int IDLE_HOUR = 12;
     private static final int IDLE_LATE_UNTIL = 20;
-    /** Не чаще раза в неделю */
+    /** Не чаще одного напоминания о неиспользуемых подписках в неделю. */
     private static final int IDLE_EVERY_DAYS = 7;
 
     private ActivityReminders() {}
 
-    /** Ставит или снимает будильники */
+    /** Ставит или снимает оба будильника в зависимости от входа в аккаунт и настроек. */
     static void schedule(Context context) {
         Context app = context.getApplicationContext();
         AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
@@ -80,11 +88,13 @@ public final class ActivityReminders {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    // ----- вечернее напоминание про серию -----
+
     static void notifyStreak(Context app) {
         Prefs prefs = new Prefs(app);
         if (!prefs.isSignedIn() || !prefs.isStreakRemind()) return;
         LocalDate today = LocalDate.now();
-        // Отмечаем проверку сразу, иначе будильник сработает снова
+        // Отмечаем проверку сразу: иначе при отсутствии причин для уведомления будильник сработал бы снова
         prefs.setStreakChecked(today.toString());
 
         refreshUsage(app);
@@ -98,11 +108,13 @@ public final class ActivityReminders {
         post(app, STREAK_NOTIFICATION, new Notification.Builder(app, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_pay)
                 .setContentTitle("Серия под угрозой: " + streak + " " + Fmt.pl(streak, "день", "дня", "дней"))
-                .setContentText("Отметьте использование, иначе серия прервётся.")
+                .setContentText("Отметьте, что сегодня пользовались подпиской, иначе серия прервётся.")
                 .setContentIntent(openApp(app, 2, STREAK_NOTIFICATION))
                 .setAutoCancel(true)
                 .setCategory(Notification.CATEGORY_REMINDER));
     }
+
+    // ----- напоминание о неиспользуемых подписках -----
 
     static void notifyIdle(Context app) {
         Prefs prefs = new Prefs(app);
@@ -139,12 +151,14 @@ public final class ActivityReminders {
                 .setCategory(Notification.CATEGORY_RECOMMENDATION));
     }
 
-    /** Подтягиваем свежую статистику приложений */
+    // ----- общее -----
+
+    /** Подтягиваем свежую статистику приложений: вдруг сегодня уже пользовались, а JustPay не открывали. */
     private static void refreshUsage(Context app) {
         try {
             UsageSync.sync(app);
         } catch (RuntimeException ignored) {
-            // Сбой чтения статистики не отменяет напоминание
+            // Статистика необязательна: сбой чтения не должен отменять напоминание
         }
     }
 
@@ -166,7 +180,7 @@ public final class ActivityReminders {
         if (nm == null || !nm.areNotificationsEnabled()) return;
         NotificationChannel ch = new NotificationChannel(CHANNEL_ID, "Серия и активность",
                 NotificationManager.IMPORTANCE_DEFAULT);
-        ch.setDescription("Серия и неиспользуемые подписки");
+        ch.setDescription("Напоминания про серию использования и подписки, которыми давно не пользуются");
         nm.createNotificationChannel(ch);
         nm.notify(id, builder.build());
     }

@@ -7,6 +7,6 @@
         <path android:strokeColor="?attr/jpTx" android:strokeWidth="2.5"
             android:pathData="M4,32a28,9 0 1,0 56,0a28,9 0 1,0 -56,0" />
     </group>
-    <path android:fillColor="?attr/jpAct"
+    <path android:fillColor="@color/jp_ac"
         android:pathData="M53.8,22.4a4.5,4.5 0 1,0 9,0a4.5,4.5 0 1,0 -9,0" />
 </vector>

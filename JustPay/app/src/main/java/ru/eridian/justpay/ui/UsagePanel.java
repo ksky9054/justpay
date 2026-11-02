@@ -26,7 +26,7 @@ import ru.eridian.justpay.usage.UsageAccess;
 import ru.eridian.justpay.usage.UsageSync;
 import ru.eridian.justpay.util.Fmt;
 
-/** Блок «Использование» в карточке подписки */
+/** Блок «Использование» в карточке подписки: серия звёзд, цифры, ручные отметки, привязка приложения. */
 final class UsagePanel {
     private static final String WEEKDAY_LETTERS = "ПВСЧПСВ";
 
@@ -71,15 +71,15 @@ final class UsagePanel {
         int record = UsageMetrics.longestStreak(active);
 
         // Серия
-        int ac = Ui.attr(a, R.attr.jpAc);
+        int ac = a.getColor(R.color.jp_ac);
         int starColor = current == 0 ? Ui.attr(a, R.attr.jpTx3) : ac;
         star.setColorFilter(starColor);
         star.setAlpha(current > 0 && !doneToday ? 0.6f : 1f);
         streak.setText(String.valueOf(current));
         streakLabel.setText(Fmt.pl(current, "день подряд", "дня подряд", "дней подряд"));
-        if (current > 0 && !doneToday) best.setText("Отметьте сегодня, иначе серия прервётся");
+        if (current > 0 && !doneToday) best.setText("Отметьте сегодня, чтобы не потерять серию");
         else if (record > 0) best.setText("Рекорд: " + record + " " + Fmt.pl(record, "день", "дня", "дней"));
-        else best.setText("Отметьте сегодня, чтобы начать серию");
+        else best.setText("Отметьте сегодняшний день, чтобы начать серию");
         buildWeek(a, week, active, today);
 
         // Цифры за 30 дней
@@ -87,18 +87,18 @@ final class UsagePanel {
         int uses30 = UsageMetrics.usesInLast(days, 30, today);
         int sec30 = UsageMetrics.secondsInLast(days, 30, today);
         uses.setText(String.valueOf(uses30));
-        time.setText(linked && sec30 > 0 ? Fmt.duration(sec30) : "нет");
+        time.setText(linked && sec30 > 0 ? Fmt.duration(sec30) : "—");
         double perUse = UsageMetrics.costPerUse(s.monthly(), uses30);
-        cost.setText(perUse < 0 ? "нет" : Fmt.money(perUse));
+        cost.setText(perUse < 0 ? "—" : Fmt.money(perUse));
 
-        // Последнее использование
+        // Подсказка по последнему использованию
         LocalDate last = UsageMetrics.lastUse(active);
         StringBuilder h = new StringBuilder();
         if (last == null) {
             long age = Fmt.diff(today, s.createdAt);
             if (s.isActive() && age >= 14) {
-                h.append("Использований нет, а подписка стоит ").append(Fmt.money(s.monthly()))
-                        .append(" в месяц. Подумайте о паузе.");
+                h.append("Использований пока нет, а подписка стоит ").append(Fmt.money(s.monthly()))
+                        .append(" в месяц. Может, её пора приостановить?");
             } else {
                 h.append("Пока нет ни одной отметки.");
             }
@@ -107,7 +107,7 @@ final class UsagePanel {
             h.append("Последний раз: ").append(ago == 0 ? "сегодня" : ago == 1 ? "вчера"
                     : ago + " " + Fmt.pl((int) ago, "день", "дня", "дней") + " назад").append('.');
             if (s.isActive() && ago >= 14) {
-                h.append(" Подписка не используется, а стоит ").append(Fmt.money(s.monthly()))
+                h.append(" Вы не пользуетесь подпиской, а она стоит ").append(Fmt.money(s.monthly()))
                         .append(" в месяц. Подумайте о паузе.");
             }
         }
@@ -118,12 +118,12 @@ final class UsagePanel {
             String label = AppCatalog.labelOf(a, s.appPackage);
             source.setText(label == null ? "Приложение удалено с телефона" : "Приложение «" + label + "»");
             sourceHint.setText(UsageAccess.isGranted(a)
-                    ? "Считаем открытия и время в приложении, плюс ручные отметки."
-                    : "Доступ к статистике выключен. Включите, чтобы данные собирались сами.");
+                    ? "Считаем, сколько раз вы открываете приложение и сколько времени в нём проводите. Ручные отметки тоже учитываются."
+                    : "Доступ к статистике телефона выключен. Включите его, и данные начнут собираться сами.");
             link.setText("Сменить приложение");
         } else {
             source.setText("Ручные отметки");
-            sourceHint.setText("Подключите приложение сервиса, и открытия посчитаются сами.");
+            sourceHint.setText("Если у сервиса есть приложение на телефоне, подключите его: открытия будут считаться сами. Если приложения нет, отмечайте использование вручную.");
             link.setText("Подключить приложение");
         }
         unlink.setVisibility(linked ? View.VISIBLE : View.GONE);
@@ -136,7 +136,7 @@ final class UsagePanel {
             usage.addManual(s.id, today, +1);
             Set<LocalDate> now = UsageMetrics.activeDays(usage.days(s.id));
             int streakNow = UsageMetrics.currentStreak(now, today);
-            Toaster.show(a, "Отмечено - серия: " + streakNow + " " + Fmt.pl(streakNow, "день", "дня", "дней"));
+            Toaster.show(a, "Отмечено · серия: " + streakNow + " " + Fmt.pl(streakNow, "день", "дня", "дней"));
             onChanged.run();
         });
         unmark.setOnClickListener(v -> {
@@ -167,12 +167,12 @@ final class UsagePanel {
                 "Открыть настройки", false, () -> a.startActivity(UsageAccess.settingsIntent(a)));
     }
 
-    /** Семь последних дней, круг со звездой там, где пользовались */
+    /** Семь последних дней: заполненный круг со звездой там, где пользовались. */
     static void buildWeek(Activity a, LinearLayout week, Set<LocalDate> active, LocalDate today) {
         week.removeAllViews();
         List<Boolean> flags = UsageMetrics.lastWeek(active, today);
         int ink = a.getColor(R.color.jp_ink);
-        int ac = Ui.attr(a, R.attr.jpAc);
+        int ac = a.getColor(R.color.jp_ac);
         for (int i = 0; i < 7; i++) {
             LocalDate d = today.minusDays(6 - i);
             boolean on = flags.get(i);

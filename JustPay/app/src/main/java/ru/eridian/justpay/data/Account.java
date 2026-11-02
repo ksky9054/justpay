@@ -2,15 +2,15 @@ package ru.eridian.justpay.data;
 
 import java.util.Locale;
 
-/** Локальный аккаунт, хранится только на телефоне */
+/** Локальный аккаунт: существует только на этом устройстве. */
 public class Account {
     public long id;
     public String name;
     public String email;
+    /** Аватар в виде «знак:цвет», см. AvatarSpec. */
     public String avatar = AvatarSpec.DEFAULT;
+    /** Код валюты из Currency. */
     public String currency = Currency.RUB.name();
-    /** Дата согласия на обработку данных, у старых аккаунтов пусто */
-    public String consentDate = "";
 
     public AvatarSpec avatarSpec() {
         return AvatarSpec.parse(avatar);
@@ -20,7 +20,7 @@ public class Account {
         return Currency.fromCode(currency);
     }
 
-    /** Инициалы для аватарки */
+    /** Две заглавные буквы для круглой аватарки. */
     public String initials() {
         String[] parts = name.trim().split("\\s+");
         StringBuilder sb = new StringBuilder();

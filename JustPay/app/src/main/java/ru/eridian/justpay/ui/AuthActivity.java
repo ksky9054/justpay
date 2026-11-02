@@ -1,20 +1,12 @@
 package ru.eridian.justpay.ui;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
+import android.os.SystemClock;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,22 +18,23 @@ import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.Account;
 import ru.eridian.justpay.data.AccountRepository;
 
-/** Вход и регистрация, аккаунты хранятся только на телефоне */
+/** Вход в локальный аккаунт и регистрация нового. Аккаунты хранятся только на этом устройстве. */
 public class AuthActivity extends BaseActivity {
     private static final int MAX_FAILS = 5;
     private static final long LOCK_MS = 30_000;
+    // Защита от перебора пароля: считаем неудачные входы и временно блокируем кнопку
+    private static int fails = 0;
+    private static long lockedUntil = 0;
 
     private static final ExecutorService WORKER = Executors.newSingleThreadExecutor();
 
     private boolean register = false;
     private boolean passwordShown = false;
     private boolean busy = false;
-    private CountDownTimer lockTimer; // отсчёт до следующей попытки входа
 
-    private View blockName, blockPass2, blockConsent;
-    private CheckBox cbTerms, cbPrivacy, cbConsent;
+    private View blockName, blockPass2;
     private EditText aName, aEmail, aPass, aPass2;
-    private TextView errName, errEmail, errPass, errPass2, errConsent, authError, submit, title, subtitle;
+    private TextView errName, errEmail, errPass, errPass2, authError, submit, title, subtitle;
     private TextView tabLogin, tabRegister, btnShow;
 
     @Override
@@ -71,19 +64,6 @@ public class AuthActivity extends BaseActivity {
         tabLogin = findViewById(R.id.tab_login);
         tabRegister = findViewById(R.id.tab_register);
         btnShow = findViewById(R.id.btn_show);
-        blockConsent = findViewById(R.id.block_consent);
-        cbTerms = findViewById(R.id.cb_terms);
-        cbPrivacy = findViewById(R.id.cb_privacy);
-        cbConsent = findViewById(R.id.cb_consent);
-        errConsent = findViewById(R.id.err_consent);
-        setConsentText(cbTerms, "Принимаю ", "пользовательское соглашение", LegalActivity.TERMS);
-        setConsentText(cbPrivacy, "Ознакомился с ", "политикой обработки персональных данных", LegalActivity.PRIVACY);
-        setConsentText(cbConsent, "Даю ", "согласие на обработку персональных данных", LegalActivity.CONSENT);
-        // Ошибка про отметки пропадает, как только пользователь что-то отметил
-        CompoundButton.OnCheckedChangeListener hideError = (button, checked) -> errConsent.setVisibility(View.GONE);
-        cbTerms.setOnCheckedChangeListener(hideError);
-        cbPrivacy.setOnCheckedChangeListener(hideError);
-        cbConsent.setOnCheckedChangeListener(hideError);
 
         if (savedInstanceState != null) register = savedInstanceState.getBoolean("register", false);
 
@@ -105,7 +85,7 @@ public class AuthActivity extends BaseActivity {
             }
             return false;
         });
-        // Кнопка «Готово» на клавиатуре
+        // Для входа на клавиатуре у пароля кнопка «Готово»
         setMode(register);
     }
 
@@ -127,75 +107,13 @@ public class AuthActivity extends BaseActivity {
         tabRegister.setSelected(reg);
         blockName.setVisibility(reg ? View.VISIBLE : View.GONE);
         blockPass2.setVisibility(reg ? View.VISIBLE : View.GONE);
-        blockConsent.setVisibility(reg ? View.VISIBLE : View.GONE);
         title.setText(reg ? "Создайте аккаунт" : "С возвращением");
         subtitle.setText(reg
-                ? "Новый аккаунт пуст."
-                : "Войдите в аккаунт.");
+                ? "Новый аккаунт пуст: подписки, платежи и отметки вы добавите сами."
+                : "Войдите, чтобы увидеть свои подписки.");
         submit.setText(reg ? "Создать аккаунт" : "Войти");
         aPass.setImeOptions(reg ? EditorInfo.IME_ACTION_NEXT : EditorInfo.IME_ACTION_DONE);
         clearErrors();
-        startLockTimer();
-    }
-
-    // Пока вход закрыт, показываем сколько секунд осталось и не даём нажать кнопку
-    private void startLockTimer() {
-        stopLockTimer();
-        long wait = prefs.lockedUntil() - System.currentTimeMillis();
-        if (register || wait <= 0) return;
-        submit.setEnabled(false);
-        submit.setAlpha(0.6f);
-        lockTimer = new CountDownTimer(wait, 1000) {
-            @Override
-            public void onTick(long left) {
-                long seconds = (left + 999) / 1000;
-                authError.setText("Много попыток. Следующая через " + seconds + " с");
-                authError.setVisibility(View.VISIBLE);
-                submit.setText("Войти через " + seconds + " с");
-            }
-
-            @Override
-            public void onFinish() {
-                stopLockTimer();
-                authError.setVisibility(View.GONE);
-                submit.setText("Войти");
-            }
-        }.start();
-    }
-
-    private void stopLockTimer() {
-        if (lockTimer != null) {
-            lockTimer.cancel();
-            lockTimer = null;
-        }
-        submit.setEnabled(true);
-        submit.setAlpha(1f);
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (lockTimer != null) lockTimer.cancel();
-        super.onDestroy();
-    }
-
-    // Название документа в тексте флажка это ссылка, остальной текст ставит или снимает отметку
-    private void setConsentText(CheckBox box, String before, String link, int doc) {
-        SpannableString text = new SpannableString(before + link);
-        text.setSpan(new ClickableSpan() {
-            @Override
-            public void onClick(View v) {
-                LegalActivity.open(AuthActivity.this, doc);
-            }
-
-            @Override
-            public void updateDrawState(TextPaint paint) {
-                paint.setColor(Ui.attr(AuthActivity.this, R.attr.jpAct));
-                paint.setUnderlineText(true);
-            }
-        }, before.length(), text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        box.setText(text);
-        box.setMovementMethod(LinkMovementMethod.getInstance());
-        box.setHighlightColor(Color.TRANSPARENT);
     }
 
     private void togglePassword() {
@@ -213,7 +131,6 @@ public class AuthActivity extends BaseActivity {
         show(aEmail, errEmail, null);
         show(aPass, errPass, null);
         show(aPass2, errPass2, null);
-        errConsent.setVisibility(View.GONE);
         authError.setVisibility(View.GONE);
     }
 
@@ -252,16 +169,11 @@ public class AuthActivity extends BaseActivity {
             show(aPass2, errPass2, "Пароли не совпадают");
             ok = false;
         }
-        if (register && !(cbTerms.isChecked() && cbPrivacy.isChecked() && cbConsent.isChecked())) {
-            errConsent.setText("Отметьте все три пункта, чтобы создать аккаунт.");
-            errConsent.setVisibility(View.VISIBLE);
-            ok = false;
-        }
         if (!ok) return;
 
-        long wait = prefs.lockedUntil() - System.currentTimeMillis();
+        long wait = lockedUntil - SystemClock.elapsedRealtime();
         if (!register && wait > 0) {
-            authError.setText("Много попыток. Подождите " + ((wait + 999) / 1000) + " с.");
+            authError.setText("Слишком много попыток. Подождите " + ((wait + 999) / 1000) + " с.");
             authError.setVisibility(View.VISIBLE);
             return;
         }
@@ -269,7 +181,7 @@ public class AuthActivity extends BaseActivity {
         setBusy(true);
         Ui.hideKeyboard(this);
         AccountRepository accounts = AccountRepository.get(this);
-        // Хеширование долгое, делаем не в главном потоке
+        // Хеширование пароля занимает заметное время, поэтому выполняется не в главном потоке
         WORKER.execute(() -> {
             Account account = null;
             String error = null;
@@ -288,24 +200,20 @@ public class AuthActivity extends BaseActivity {
                 if (isFinishing() || isDestroyed()) return;
                 setBusy(false);
                 if (result != null) {
-                    prefs.setLoginFails(0);
+                    fails = 0;
                     prefs.setAccountId(result.id);
                     openMain();
                     return;
                 }
                 if (!register) {
-                    // Ошибки считаем в настройках, чтобы перезапуск приложения не снимал блокировку
-                    int fails = prefs.loginFails() + 1;
+                    fails++;
                     if (fails >= MAX_FAILS) {
-                        prefs.setLoginFails(0);
-                        prefs.setLockedUntil(System.currentTimeMillis() + LOCK_MS);
-                    } else {
-                        prefs.setLoginFails(fails);
+                        fails = 0;
+                        lockedUntil = SystemClock.elapsedRealtime() + LOCK_MS;
                     }
                 }
                 authError.setText(message);
                 authError.setVisibility(View.VISIBLE);
-                startLockTimer();
             });
         });
     }

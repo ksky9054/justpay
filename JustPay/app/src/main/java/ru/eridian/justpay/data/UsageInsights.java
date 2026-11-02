@@ -9,14 +9,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** Выводы из статистики для аналитики и уведомлений */
+/** Выводы из статистики, которые нужны и экрану «Аналитика», и уведомлениям. */
 public final class UsageInsights {
     private UsageInsights() {}
 
-    /** Через сколько дней без активности подписка считается неиспользуемой */
+    /** Сколько дней без активности считается «давно не используется». */
     public static final int IDLE_DAYS = 14;
 
-    /** Неиспользуемые подписки, дорогие первыми; новые не считаем */
+    /**
+     * Активные подписки, которым не меньше days дней и по которым столько же дней нет активности.
+     * Самые дорогие в месяц идут первыми. Только что добавленную подписку неиспользуемой не считаем.
+     */
     public static List<Subscription> idle(List<Subscription> subs,
                                           Map<Long, Map<LocalDate, UsageDay>> usage,
                                           LocalDate today, int days) {

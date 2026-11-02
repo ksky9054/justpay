@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.inputmethod.InputMethodManager;
 
-/** Мелкие помощники: размеры, цвета темы, отступы */
+/** Мелкие помощники для работы с размерами, цветами темы и системными отступами. */
 public final class Ui {
     private Ui() {}
 
@@ -19,14 +19,14 @@ public final class Ui {
                 c.getResources().getDisplayMetrics()));
     }
 
-    /** Цвет из атрибута темы */
+    /** Цвет из атрибута текущей темы (например, R.attr.jpS1). */
     public static int attr(Context c, int attrId) {
         TypedValue tv = new TypedValue();
         c.getTheme().resolveAttribute(attrId, tv, true);
         return tv.data;
     }
 
-    /** Смешивает два цвета, t - доля первого */
+    /** Смешивает два цвета: доля t берётся от a, остальное от b; результат непрозрачный. */
     public static int blend(int a, int b, float t) {
         int r = Math.round(Color.red(a) * t + Color.red(b) * (1 - t));
         int g = Math.round(Color.green(a) * t + Color.green(b) * (1 - t));
@@ -38,7 +38,10 @@ public final class Ui {
         v.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
-    /** Добавляет отступы под строку состояния, жесты и клавиатуру */
+    /**
+     * Приложение рисуется под системными панелями. Этот слушатель добавляет к корневому
+     * контейнеру отступы под строку состояния, жесты навигации и клавиатуру.
+     */
     public static void fitSystemBars(View root) {
         root.setOnApplyWindowInsetsListener((v, insets) -> {
             int l, t, r, b;

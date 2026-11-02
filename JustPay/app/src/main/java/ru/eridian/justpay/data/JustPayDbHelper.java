@@ -4,10 +4,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/** База данных: аккаунты, подписки и статистика использования */
+/**
+ * База данных приложения: аккаунты, подписки аккаунта и дневная статистика использования.
+ * Подписки и статистика принадлежат аккаунту и удаляются вместе с ним (внешние ключи).
+ * Новый аккаунт пуст: никаких демо-записей приложение не создаёт.
+ */
 public class JustPayDbHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "justpay.db";
-    public static final int DB_VERSION = 5;
+    public static final int DB_VERSION = 4;
 
     // accounts
     public static final String T_ACCOUNTS = "accounts";
@@ -20,7 +24,6 @@ public class JustPayDbHelper extends SQLiteOpenHelper {
     public static final String A_CREATED = "created_at";
     public static final String A_AVATAR = "avatar";
     public static final String A_CURRENCY = "currency";
-    public static final String A_CONSENT = "consent_date";
 
     // subscriptions
     public static final String TABLE = "subscriptions";
@@ -68,22 +71,19 @@ public class JustPayDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 3) {
-            // До версии 3 аккаунтов не было, демо-записи выбрасываем
+            // До версии 3 аккаунтов не было, а в таблице лежали только демо-записи.
+            // Их выбрасываем: каждая подписка теперь принадлежит аккаунту.
             db.execSQL("DROP TABLE IF EXISTS " + T_USAGE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE);
             createAccounts(db);
             createSubscriptions(db);
             createUsage(db);
         } else if (oldVersion < 4) {
-            // Версия 4: аватар и валюта аккаунта
+            // Версия 4: аватар и валюта аккаунта. У существующих аккаунтов остаются значения по умолчанию.
             db.execSQL("ALTER TABLE " + T_ACCOUNTS + " ADD COLUMN " + A_AVATAR
                     + " TEXT NOT NULL DEFAULT 'initials:0'");
             db.execSQL("ALTER TABLE " + T_ACCOUNTS + " ADD COLUMN " + A_CURRENCY
                     + " TEXT NOT NULL DEFAULT 'RUB'");
-        }
-        if (oldVersion >= 3 && oldVersion < 5) {
-            // Версия 5: дата согласия на обработку данных, у старых аккаунтов пустая
-            db.execSQL("ALTER TABLE " + T_ACCOUNTS + " ADD COLUMN " + A_CONSENT + " TEXT NOT NULL DEFAULT ''");
         }
     }
 
@@ -97,8 +97,7 @@ public class JustPayDbHelper extends SQLiteOpenHelper {
                 + A_ITER + " INTEGER NOT NULL, "
                 + A_CREATED + " TEXT NOT NULL, "
                 + A_AVATAR + " TEXT NOT NULL DEFAULT 'initials:0', "
-                + A_CURRENCY + " TEXT NOT NULL DEFAULT 'RUB', "
-                + A_CONSENT + " TEXT NOT NULL DEFAULT '')");
+                + A_CURRENCY + " TEXT NOT NULL DEFAULT 'RUB')");
     }
 
     private static void createSubscriptions(SQLiteDatabase db) {

@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import ru.eridian.justpay.R;
 import ru.eridian.justpay.util.Fmt;
 
-/** Свой срок напоминания: за сколько дней предупредить */
+/** Выбор своего срока напоминания: за сколько дней до списания присылать уведомление. */
 final class DaysSheet {
     private DaysSheet() {}
 

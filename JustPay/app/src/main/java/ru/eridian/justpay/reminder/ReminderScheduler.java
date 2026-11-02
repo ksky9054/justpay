@@ -14,15 +14,17 @@ import java.util.List;
 import java.util.Set;
 
 import ru.eridian.justpay.R;
-import ru.eridian.justpay.data.Account;
-import ru.eridian.justpay.data.AccountRepository;
 import ru.eridian.justpay.data.Prefs;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.data.SubscriptionRepository;
 import ru.eridian.justpay.ui.DetailActivity;
 import ru.eridian.justpay.util.Fmt;
 
-/** Напоминания о списаниях: один будильник на ближайшее */
+/**
+ * Напоминания о предстоящих списаниях. Заводится один будильник на ближайшее напоминание;
+ * когда он срабатывает, показываются уведомления и будильник переставляется на следующее.
+ * Точные будильники не нужны, поэтому специальное разрешение не требуется.
+ */
 public final class ReminderScheduler {
     public static final String ACTION_REMIND = "ru.eridian.justpay.action.REMIND";
 
@@ -32,7 +34,7 @@ public final class ReminderScheduler {
 
     private ReminderScheduler() {}
 
-    /** Пересчитывает ближайшее напоминание */
+    /** Пересчитывает время ближайшего напоминания и переставляет будильник. */
     public static void reschedule(Context context) {
         Context app = context.getApplicationContext();
         AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
@@ -41,7 +43,7 @@ public final class ReminderScheduler {
         am.cancel(pi);
         long at = nextTrigger(app);
         if (at > 0) am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi);
-        // Остальные напоминания
+        // Вечернее напоминание про серию и еженедельное про неиспользуемые подписки
         ActivityReminders.schedule(app);
     }
 
@@ -55,13 +57,13 @@ public final class ReminderScheduler {
         return s.id + ":" + s.next;
     }
 
-    /** Ещё не напоминали, а списание впереди */
+    /** Напоминание ещё не отправлено, а списание впереди или сегодня. */
     private static boolean pending(Subscription s, Prefs prefs, Set<String> done, LocalDate today) {
         LocalDate rd = s.remindDate(prefs);
         return rd != null && !s.next.isBefore(today) && !done.contains(key(s));
     }
 
-    /** Время ближайшего напоминания или -1 */
+    /** Время ближайшего напоминания в миллисекундах или -1, если напоминать не о чем. */
     static long nextTrigger(Context app) {
         Prefs prefs = new Prefs(app);
         Set<String> done = prefs.notified();
@@ -72,18 +74,18 @@ public final class ReminderScheduler {
             if (!s.isActive() || s.next == null || !pending(s, prefs, done, today)) continue;
             long ms = s.remindDate(prefs).atTime(REMIND_HOUR, 0)
                     .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            // Время уже прошло, шлём сразу
+            // Время напоминания уже прошло (например, подписку добавили поздно): шлём сразу.
             if (ms <= now) ms = now + 5000;
             if (best < 0 || ms < best) best = ms;
         }
         return best;
     }
 
-    /** Показывает уведомления, у которых пришло время */
+    /** Показывает уведомления по всем подпискам, у которых напоминание наступило. */
     static void notifyDue(Context app) {
         Prefs prefs = new Prefs(app);
-        // Экранов нет, валюту ставим сами
-        Account acc = AccountRepository.get(app).find(prefs.accountId());
+        // Приёмник запускается без экранов: валюту аккаунта подставляем сами
+        ru.eridian.justpay.data.Account acc = ru.eridian.justpay.data.AccountRepository.get(app).find(prefs.accountId());
         Fmt.setCurrency(acc == null ? null : acc.currencyValue());
         Set<String> done = prefs.notified();
         LocalDate today = LocalDate.now();
@@ -95,7 +97,7 @@ public final class ReminderScheduler {
         for (Subscription s : all) {
             if (!s.isActive() || s.next == null || !pending(s, prefs, done, today)) continue;
             if (s.remindDate(prefs).isAfter(today)) continue;
-            // Отмечаем всегда, иначе будильник сработает снова
+            // Отмечаем в любом случае, иначе при выключенных уведомлениях будильник сработал бы повторно.
             done.add(key(s));
             if (canPost) nm.notify((int) s.id, build(app, s, today));
         }
@@ -116,7 +118,7 @@ public final class ReminderScheduler {
         return new Notification.Builder(app, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_pay)
                 .setContentTitle(when + " спишется " + s.name)
-                .setContentText(Fmt.price(s.price) + " - " + Fmt.dayLong(s.next) + (s.hasCard() ? " - " + s.card : ""))
+                .setContentText(Fmt.price(s.price) + " · " + Fmt.dayLong(s.next) + (s.hasCard() ? " · " + s.card : ""))
                 .setContentIntent(tap)
                 .setAutoCancel(true)
                 .setCategory(Notification.CATEGORY_REMINDER)
@@ -126,7 +128,7 @@ public final class ReminderScheduler {
     private static void ensureChannel(NotificationManager nm) {
         NotificationChannel ch = new NotificationChannel(CHANNEL_ID, "Напоминания о платежах",
                 NotificationManager.IMPORTANCE_DEFAULT);
-        ch.setDescription("Предстоящие списания");
+        ch.setDescription("Уведомления о предстоящих списаниях по подпискам");
         nm.createNotificationChannel(ch);
     }
 }

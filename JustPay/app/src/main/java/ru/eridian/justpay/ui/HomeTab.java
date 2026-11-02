@@ -20,7 +20,7 @@ import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.util.Fmt;
 
-/** Вкладка «Главная»: сумма, поиск, фильтр и список */
+/** Вкладка «Главная»: сумма в месяц, ближайшее списание, поиск, фильтр и список подписок. */
 final class HomeTab {
     private final MainActivity a;
     private final View root;
@@ -117,9 +117,9 @@ final class HomeTab {
         StringBuilder meta = new StringBuilder();
         meta.append(active.size()).append(' ')
                 .append(Fmt.pl(active.size(), "активная", "активные", "активных"));
-        if (!paused.isEmpty()) meta.append(" - ").append(paused.size()).append(" на паузе");
-        meta.append(" - ").append(Fmt.money(total * 12)).append(" в год");
-        totalMeta.setText(all.isEmpty() ? "Добавьте первую подписку" : meta);
+        if (!paused.isEmpty()) meta.append(" · ").append(paused.size()).append(" на паузе");
+        meta.append(" · ").append(Fmt.money(total * 12)).append(" в год");
+        totalMeta.setText(all.isEmpty() ? "Добавьте первую подписку, и мы посчитаем расходы" : meta);
 
         savedPill.setVisibility(saved > 0 ? View.VISIBLE : View.GONE);
         savedText.setText("Пауза экономит " + Fmt.money(saved) + " в месяц");
@@ -134,9 +134,9 @@ final class HomeTab {
         } else {
             final Subscription n = next;
             nextCard.setVisibility(View.VISIBLE);
-            nextTag.setText(("Ближайшее - " + Fmt.rel(n.next, today)).toUpperCase(Locale.getDefault()));
+            nextTag.setText(("Ближайшее · " + Fmt.rel(n.next, today)).toUpperCase(Locale.getDefault()));
             nextName.setText(n.name);
-            nextSub.setText(Fmt.dayLong(n.next) + (n.hasCard() ? " - " + n.card : ""));
+            nextSub.setText(Fmt.dayLong(n.next) + (n.hasCard() ? " · " + n.card : ""));
             nextPrice.setText(Fmt.price(n.price));
             nextCard.setOnClickListener(v -> a.openDetail(n.id));
         }
@@ -144,14 +144,14 @@ final class HomeTab {
         bellDot.setVisibility(NotificationsActivity.hasUnread(a.prefs, all, today) ? View.VISIBLE : View.GONE);
 
         // Фильтры
-        segAll.setText("Все - " + all.size());
-        segActive.setText("Активные - " + active.size());
-        segPaused.setText("Пауза - " + paused.size());
+        segAll.setText("Все · " + all.size());
+        segActive.setText("Активные · " + active.size());
+        segPaused.setText("Пауза · " + paused.size());
         segAll.setSelected(filter.equals("all"));
         segActive.setSelected(filter.equals("active"));
         segPaused.setSelected(filter.equals("paused"));
 
-        // Сначала активные по дате, потом на паузе
+        // Список: сначала активные по дате списания, потом приостановленные
         List<Subscription> sorted = new ArrayList<>(all);
         sorted.sort(Comparator
                 .comparing((Subscription s) -> !s.isActive())
@@ -193,23 +193,26 @@ final class HomeTab {
         View item = inflater.inflate(R.layout.item_sub_row, parent, false);
         item.findViewById(R.id.divider).setVisibility(first ? View.GONE : View.VISIBLE);
 
+        TextView mk = item.findViewById(R.id.mk);
         TextView name = item.findViewById(R.id.name);
         TextView line = item.findViewById(R.id.line);
         TextView price = item.findViewById(R.id.price);
         TextView cyc = item.findViewById(R.id.cyc);
 
+        mk.setText(s.mark);
         name.setText(s.name);
         price.setText(Fmt.price(s.price));
         cyc.setText("в " + Fmt.cycleShort(s.cycle));
 
         if (s.isActive() && s.next != null) {
-            line.setText(Fmt.dayShort(s.next) + " - " + Fmt.rel(s.next, today));
+            line.setText(Fmt.dayShort(s.next) + " · " + Fmt.rel(s.next, today));
             line.setTextColor(Ui.attr(a, R.attr.jpTx2));
         } else {
             line.setText("На паузе");
             line.setTextColor(Ui.attr(a, R.attr.jpAct));
         }
         float alpha = s.isActive() ? 1f : 0.5f;
+        mk.setAlpha(alpha);
         name.setAlpha(alpha);
         item.findViewById(R.id.price_col).setAlpha(alpha);
 

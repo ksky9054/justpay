@@ -2,14 +2,14 @@ package ru.eridian.justpay.data;
 
 import java.time.LocalDate;
 
-/** Использование подписки за один день */
+/** Использование одной подписки за один день: данные приложения и ручные отметки. */
 public class UsageDay {
     public final LocalDate day;
-    /** Открытия приложения */
+    /** Сколько раз за день открывали приложение сервиса (по статистике телефона). */
     public int opens;
-    /** Секунды на экране */
+    /** Сколько секунд приложение было на экране. */
     public int seconds;
-    /** Ручные отметки */
+    /** Ручные отметки «сегодня пользовался». */
     public int manual;
 
     public UsageDay(LocalDate day) {
@@ -23,7 +23,7 @@ public class UsageDay {
         this.manual = manual;
     }
 
-    /** Открытия плюс ручные отметки */
+    /** Сколько раз за день пользовались: открытия плюс ручные отметки. */
     public int uses() {
         return opens + manual;
     }

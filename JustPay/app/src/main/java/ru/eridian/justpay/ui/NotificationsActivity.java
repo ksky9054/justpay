@@ -17,15 +17,15 @@ import ru.eridian.justpay.data.Prefs;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.util.Fmt;
 
-/** Уведомления внутри приложения */
+/** Уведомления внутри приложения: предстоящие списания и подписки на паузе. */
 public class NotificationsActivity extends BaseActivity {
 
-    /** Списания, о которых пора напомнить */
+    /** Списания, о которых пора напомнить: дата напоминания каждой подписки уже наступила. */
     static List<Subscription> upcoming(Prefs prefs, List<Subscription> all, LocalDate today) {
         List<Subscription> out = new ArrayList<>();
         for (Subscription s : all) {
             LocalDate rd = s.remindDate(prefs);
-            // Напомнить пора, а списание ещё впереди
+            // Напоминание наступило (дата у каждой подписки своя), а списание ещё впереди
             if (rd != null && !rd.isAfter(today) && !s.next.isBefore(today)) out.add(s);
         }
         Collections.sort(out, (x, y) -> x.next.compareTo(y.next));
@@ -63,7 +63,7 @@ public class NotificationsActivity extends BaseActivity {
         LocalDate today = today();
         List<Subscription> all = repo.all();
         boolean unread = !today.toString().equals(prefs.notifSeenDate());
-        int dotColor = unread ? Ui.attr(this, R.attr.jpAc) : 0;
+        int dotColor = unread ? getColor(R.color.jp_ac) : 0;
 
         List<Subscription> soon = upcoming(prefs, all, today);
         List<Subscription> paused = new ArrayList<>();
@@ -78,8 +78,8 @@ public class NotificationsActivity extends BaseActivity {
                 long d = Fmt.diff(s.next, today);
                 String when = d == 0 ? "Сегодня" : d == 1 ? "Завтра"
                         : "Через " + d + " " + Fmt.pl((int) d, "день", "дня", "дней");
-                addItem(card, inflater, i, when + ", " + s.name,
-                        Fmt.price(s.price) + " спишется " + Fmt.dayLong(s.next) + (s.hasCard() ? " - " + s.card : ""),
+                addItem(card, inflater, i, when + " — " + s.name,
+                        Fmt.price(s.price) + " спишется " + Fmt.dayLong(s.next) + (s.hasCard() ? " · " + s.card : ""),
                         Fmt.dayShort(s.next), dotColor, s.id);
             }
         }
@@ -89,7 +89,7 @@ public class NotificationsActivity extends BaseActivity {
             for (int i = 0; i < paused.size(); i++) {
                 Subscription s = paused.get(i);
                 addItem(card, inflater, i, s.name + " на паузе",
-                        "Экономия " + Fmt.money(s.monthly()) + " в месяц. Списаний не будет.",
+                        "Экономия " + Fmt.money(s.monthly()) + " в месяц. Следующего списания не будет.",
                         s.prev == null ? "" : Fmt.dayShort(s.prev), 0, s.id);
             }
         }

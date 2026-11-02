@@ -20,42 +20,44 @@ import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.data.SubscriptionRepository;
 import ru.eridian.justpay.data.UsageRepository;
 
-/** Берёт из статистики телефона открытия и время в приложениях; Android хранит события около недели, поэтому копим в базе */
+/**
+ * Забирает из статистики телефона, сколько раз и сколько времени пользователь провёл
+ * в приложении сервиса. Читаются данные только приложений, которые пользователь сам привязал
+ * к подписке. Ничего не отправляется в сеть, результат сохраняется в таблице usage_days.
+ *
+ * Android хранит события использования недолго (около недели), поэтому статистика копится
+ * в базе при каждом открытии JustPay, а уже записанные дни не стираются.
+ */
 public final class UsageSync {
     private UsageSync() {}
 
     private static final int WINDOW_DAYS = 7;
-    /** Возврат быстрее этого срока считаем тем же открытием */
+    /** Возврат в приложение быстрее этого срока считается продолжением того же открытия. */
     private static final long SAME_LAUNCH_GAP_MS = 15_000;
-    // События: 1 - приложение на экране, 2 - ушло с экрана
+    // Типы событий: ACTIVITY_RESUMED = 1 и ACTIVITY_PAUSED = 2
+    // (на Android 8-9 те же числа называются MOVE_TO_FOREGROUND и MOVE_TO_BACKGROUND).
     private static final int EVENT_FOREGROUND = 1;
     private static final int EVENT_BACKGROUND = 2;
 
     private static final Executor IO = Executors.newSingleThreadExecutor();
 
-    /** Работает в фоне, экран обновлять через runOnUiThread */
+    /** Синхронизация в фоновом потоке; onDone вызывается там же, обновлять экран нужно через runOnUiThread. */
     public static void syncAsync(Context context, Runnable onDone) {
         Context app = context.getApplicationContext();
         IO.execute(() -> {
             try {
                 sync(app);
             } catch (RuntimeException ignored) {
-                // Сбой чтения статистики не должен ронять приложение
+                // Статистика необязательна: сбой чтения не должен ронять приложение
             }
             if (onDone != null) onDone.run();
         });
     }
 
-    /** Сколько раз открывали приложение и сколько секунд оно было на экране за один день */
-    static final class DayCount {
-        int opens;
-        int seconds;
-    }
-
     static final class Counter {
         long fgSince = -1;
         long lastPause = -1;
-        final Map<LocalDate, DayCount> perDay = new HashMap<>();
+        final Map<LocalDate, int[]> perDay = new HashMap<>(); // день -> {открытия, секунды}
     }
 
     public static void sync(Context context) {
@@ -96,26 +98,26 @@ public final class UsageSync {
         for (Subscription s : linked) {
             Counter c = counters.get(s.appPackage);
             if (c == null) continue;
-            for (Map.Entry<LocalDate, DayCount> d : c.perDay.entrySet()) {
-                int opens = d.getValue().opens;
-                int seconds = d.getValue().seconds;
-                // Нулевые дни не пишем: старые события могли удалиться, пустой ответ не должен затирать накопленное
+            for (Map.Entry<LocalDate, int[]> d : c.perDay.entrySet()) {
+                int opens = d.getValue()[0], seconds = d.getValue()[1];
+                // Нулевые дни не пишем: события старше недели система уже могла удалить,
+                // и пустой ответ не должен затирать то, что накопилось раньше.
                 if (opens > 0 || seconds > 0) usage.saveAuto(s.id, d.getKey(), opens, seconds);
             }
         }
     }
 
-    /** Учитывает одно событие */
+    /** Учитывает одно событие. Вынесено отдельно, чтобы логику можно было проверить без Android. */
     static void apply(Counter c, int type, long ts, ZoneId zone) {
         if (type == EVENT_FOREGROUND) {
             if (c.fgSince < 0) {
                 boolean newLaunch = c.lastPause < 0 || ts - c.lastPause > SAME_LAUNCH_GAP_MS;
-                if (newLaunch) bucket(c, ts, zone).opens++;
+                if (newLaunch) bucket(c, ts, zone)[0]++;
                 c.fgSince = ts;
             }
         } else if (type == EVENT_BACKGROUND) {
             if (c.fgSince >= 0) {
-                bucket(c, c.fgSince, zone).seconds += (int) ((ts - c.fgSince) / 1000);
+                bucket(c, c.fgSince, zone)[1] += (int) ((ts - c.fgSince) / 1000);
                 c.fgSince = -1;
                 c.lastPause = ts;
             }
@@ -125,19 +127,18 @@ public final class UsageSync {
     static void finish(Counter c, long end, ZoneId zone) {
         // Приложение всё ещё на экране
         if (c.fgSince >= 0) {
-            bucket(c, c.fgSince, zone).seconds += (int) ((end - c.fgSince) / 1000);
+            bucket(c, c.fgSince, zone)[1] += (int) ((end - c.fgSince) / 1000);
             c.fgSince = -1;
         }
     }
 
-    // Запись за нужный день, если её ещё нет, создаём
-    private static DayCount bucket(Counter c, long ts, ZoneId zone) {
+    private static int[] bucket(Counter c, long ts, ZoneId zone) {
         LocalDate day = Instant.ofEpochMilli(ts).atZone(zone).toLocalDate();
-        DayCount count = c.perDay.get(day);
-        if (count == null) {
-            count = new DayCount();
-            c.perDay.put(day, count);
+        int[] v = c.perDay.get(day);
+        if (v == null) {
+            v = new int[2];
+            c.perDay.put(day, v);
         }
-        return count;
+        return v;
     }
 }

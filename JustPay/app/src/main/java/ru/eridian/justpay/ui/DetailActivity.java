@@ -14,14 +14,13 @@ import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.util.Fmt;
 
-/** Карточка подписки */
+/** Карточка подписки: сведения, история списаний, пауза и возобновление, удаление. */
 public class DetailActivity extends BaseActivity {
     public static final String EXTRA_ID = "id";
 
     private long id;
-    private TextView pill, name, cat, price, cyc, next, rel, cycle, card, year, toggle;
+    private TextView pill, mk, name, cat, price, cyc, next, rel, cycle, card, year, toggle;
     private LinearLayout history;
-    private View historyTitle;
     private UsagePanel usagePanel;
 
     @Override
@@ -33,6 +32,7 @@ public class DetailActivity extends BaseActivity {
         id =getIntent().getLongExtra(EXTRA_ID, 0);
 
         pill = findViewById(R.id.pill_status);
+        mk = findViewById(R.id.d_mk);
         name = findViewById(R.id.d_name);
         cat = findViewById(R.id.d_cat);
         price = findViewById(R.id.d_price);
@@ -43,7 +43,6 @@ public class DetailActivity extends BaseActivity {
         card = findViewById(R.id.d_card);
         year = findViewById(R.id.d_year);
         history = findViewById(R.id.d_hist);
-        historyTitle = findViewById(R.id.d_hist_title);
         toggle = findViewById(R.id.btn_toggle);
 
         findViewById(R.id.btn_back).setOnClickListener(v -> finishToRight());
@@ -78,43 +77,44 @@ public class DetailActivity extends BaseActivity {
 
         GradientDrawable pillBg = new GradientDrawable();
         pillBg.setCornerRadius(Ui.dp(this, 16));
-        pillBg.setColor(active ? Ui.attr(this, R.attr.jpS1) : Ui.attr(this, R.attr.jpAc));
+        pillBg.setColor(active ? Ui.attr(this, R.attr.jpS1) : getColor(R.color.jp_ac));
         pill.setBackground(pillBg);
         pill.setTextColor(active ? Ui.attr(this, R.attr.jpTx) : getColor(R.color.jp_ink));
         pill.setText(active ? "Активна" : "На паузе");
 
+        mk.setText(s.mark);
         name.setText(s.name);
-        cat.setText(s.category + " - с " + s.since);
+        cat.setText(s.category + " · с " + s.since);
         price.setText(Fmt.price(s.price));
         cyc.setText("/ " + Fmt.cycleShort(s.cycle));
 
-        next.setText(active && s.next != null ? Fmt.dayLong(s.next) : "нет");
+        next.setText(active && s.next != null ? Fmt.dayLong(s.next) : "—");
         rel.setText(active && s.next != null ? Fmt.rel(s.next, today) : "приостановлена");
         cycle.setText(Fmt.cycleFull(s.cycle));
         card.setText(s.hasCard() ? s.card : "Не указан");
         year.setText(Fmt.money(s.monthly() * 12));
         usagePanel.bind(s);
 
-        // Дата напоминания и откуда она
+        // Напоминание: дата, когда придёт уведомление, и откуда она взята
         TextView remind = findViewById(R.id.d_remind);
         TextView remindSub = findViewById(R.id.d_remind_sub);
         LocalDate rd = s.remindDate(prefs);
         if (!active) {
-            remind.setText("нет");
+            remind.setText("—");
             remindSub.setText("Подписка на паузе");
         } else if (rd == null) {
             remind.setText("Выключено");
             remindSub.setText(s.remindDays == Subscription.REMIND_OFF
                     ? "Для этой подписки" : "Выключено в профиле");
         } else {
-            remind.setText(Fmt.dayLong(rd) + " - 09:00");
+            remind.setText(Fmt.dayLong(rd) + " · 09:00");
             int n = s.effectiveRemindDays(prefs);
             String before = n == 0 ? "в день списания"
                     : "за " + n + " " + Fmt.pl(n, "день", "дня", "дней") + " до списания";
-            remindSub.setText(before + (s.remindDays == Subscription.REMIND_DEFAULT ? " - как в профиле" : ""));
+            remindSub.setText(before + (s.remindDays == Subscription.REMIND_DEFAULT ? " · как в профиле" : ""));
         }
 
-        // Три последних списания
+        // История: три последних списания по расписанию
         history.removeAllViews();
         LocalDate base = s.next != null ? s.next : (s.prev != null ? s.prev : today);
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -122,8 +122,6 @@ public class DetailActivity extends BaseActivity {
         for (int k = 1; count < 3 && k < 40; k++) {
             LocalDate t = Subscription.shift(base, s.cycle, -k);
             if (!t.isBefore(today)) continue;
-            // Раньше создания подписки списаний не было
-            if (t.isBefore(s.createdAt)) break;
             View row = inflater.inflate(R.layout.item_history, history, false);
             row.findViewById(R.id.divider).setVisibility(count == 0 ? View.GONE : View.VISIBLE);
             ((TextView) row.findViewById(R.id.date)).setText(Fmt.dayFull(t));
@@ -131,10 +129,6 @@ public class DetailActivity extends BaseActivity {
             history.addView(row);
             count++;
         }
-        // Пока списаний не было, раздел скрыт
-        int historyVisible = count == 0 ? View.GONE : View.VISIBLE;
-        historyTitle.setVisibility(historyVisible);
-        history.setVisibility(historyVisible);
 
         if (active) {
             toggle.setText("Приостановить подписку");
@@ -175,14 +169,14 @@ public class DetailActivity extends BaseActivity {
                 before.setText(Fmt.money(total));
                 before.setPaintFlags(before.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
                 ((TextView) body.findViewById(R.id.b_after)).setText(Fmt.money(total - month));
-            }, "Меняется только статус в JustPay. Автоплатёж отключайте в самом сервисе.",
+            }, "Статус изменится в JustPay. Чтобы деньги не списались, отключите автоплатёж в настройках самого сервиса.",
                     "Приостановить", false, () -> {
                         s.status = Subscription.PAUSED;
                         s.prev = s.next;
                         s.next = null;
                         repo.update(s);
                         bind();
-                        Toaster.show(this, "«" + s.name + "» на паузе - экономия " + Fmt.money(month) + " в месяц");
+                        Toaster.show(this, "«" + s.name + "» на паузе · −" + Fmt.money(month) + " в месяц");
                     });
         } else {
             LocalDate base = s.prev != null ? s.prev : today();
@@ -210,7 +204,7 @@ public class DetailActivity extends BaseActivity {
         Subscription s = repo.find(id);
         if (s == null) return;
         ConfirmSheet.show(this, "Удалить «" + s.name + "»?", 0, null,
-                "Подписка и история удалятся. Отменить нельзя.",
+                "Подписка и её история исчезнут из JustPay. Отменить удаление будет нельзя.",
                 "Удалить", true, () -> {
                     repo.delete(s.id);
                     Toaster.post("«" + s.name + "» удалена из JustPay");
