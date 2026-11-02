@@ -15,7 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/** Приложения на телефоне, которые можно привязать к подписке. */
+/** Приложения, которые можно привязать к подписке */
 public final class AppCatalog {
     private AppCatalog() {}
 
@@ -23,7 +23,7 @@ public final class AppCatalog {
         public final String pkg;
         public final String label;
         public final Drawable icon;
-        /** Название похоже на подписку: такие приложения показываются первыми. */
+        /** Похоже на название подписки, такие идут первыми */
         public boolean suggested;
 
         AppInfo(String pkg, String label, Drawable icon) {
@@ -33,7 +33,7 @@ public final class AppCatalog {
         }
     }
 
-    /** Известные сервисы: слово в названии подписки -> пакет их приложения. */
+    /** Известные сервисы: слово в названии -> пакет */
     private static final Map<String, String> KNOWN = new LinkedHashMap<>();
 
     static {
@@ -64,7 +64,7 @@ public final class AppCatalog {
                 "плюс", "прайм", "prime");
     }
 
-    /** Все приложения с значком запуска, кроме самого JustPay. Подходящие по названию идут первыми. */
+    /** Приложения с значком запуска, подходящие по названию первыми */
     public static List<AppInfo> launchable(Context context, String subscriptionName) {
         PackageManager pm = context.getPackageManager();
         Intent main = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
@@ -95,7 +95,7 @@ public final class AppCatalog {
         return out;
     }
 
-    /** Первое значимое слово названия подписки: «Telegram Premium» -> «telegram». */
+    /** Первое слово названия: «Telegram Premium» -> «telegram» */
     static String firstToken(String name) {
         for (String t : name.split("[^\\p{L}\\p{N}]+")) {
             if (t.length() >= 3 && !STOP_WORDS.contains(t)) return t;
@@ -103,7 +103,7 @@ public final class AppCatalog {
         return "";
     }
 
-    /** Название приложения или null, если оно удалено с телефона. */
+    /** Название приложения или null, если удалено */
     public static String labelOf(Context context, String pkg) {
         PackageManager pm = context.getPackageManager();
         Intent main = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setPackage(pkg);

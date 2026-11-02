@@ -11,10 +11,7 @@ import java.util.List;
 
 import ru.eridian.justpay.reminder.ReminderScheduler;
 
-/**
- * Вся работа с таблицей подписок. Видны и изменяются только подписки аккаунта,
- * в который выполнен вход; без входа список пуст.
- */
+/** Работа с таблицей подписок текущего аккаунта */
 public final class SubscriptionRepository {
     private static SubscriptionRepository instance;
 
@@ -59,7 +56,7 @@ public final class SubscriptionRepository {
         }
     }
 
-    // После любого изменения данных пересчитываем время ближайшего напоминания.
+    // Пересчитываем ближайшее напоминание
 
     public long insert(Subscription s) {
         s.accountId = account();
@@ -74,7 +71,7 @@ public final class SubscriptionRepository {
     }
 
     public void delete(long id) {
-        // Статистика использования удаляется каскадом
+        // Статистика удалится каскадом
         helper.getWritableDatabase().delete(JustPayDbHelper.TABLE,
                 JustPayDbHelper.COL_ID + " = ? AND " + JustPayDbHelper.COL_ACCOUNT + " = ?",
                 new String[]{String.valueOf(id), String.valueOf(account())});
@@ -87,7 +84,7 @@ public final class SubscriptionRepository {
                 new String[]{String.valueOf(s.id), String.valueOf(account())});
     }
 
-    /** Если дата списания уже прошла, переносит её на следующий период. */
+    /** Переносит прошедшую дату списания на следующий период */
     public void rollForward(LocalDate today) {
         boolean changed = false;
         SQLiteDatabase db = helper.getWritableDatabase();

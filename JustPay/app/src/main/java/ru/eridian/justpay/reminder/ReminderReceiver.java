@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-/** Срабатывает от будильников: показывает нужное уведомление и ставит следующий будильник. */
+/** Принимает сигнал будильника, показывает уведомление и ставит следующий */
 public class ReminderReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

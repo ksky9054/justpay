@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.time.LocalDate;
 import java.util.Locale;
 
-/** Регистрация, вход и удаление локальных аккаунтов. */
+/** Регистрация, вход и удаление аккаунтов */
 public final class AccountRepository {
     private static AccountRepository instance;
 
@@ -23,7 +23,7 @@ public final class AccountRepository {
         return instance;
     }
 
-    /** Ошибка с текстом, который можно показать пользователю. */
+    /** Ошибка с текстом для пользователя */
     public static class AccountException extends Exception {
         public AccountException(String message) {
             super(message);
@@ -36,7 +36,7 @@ public final class AccountRepository {
 
     public Account register(String name, String email, String password) throws AccountException {
         String mail = normalizeEmail(email);
-        if (exists(mail)) throw new AccountException("Аккаунт с такой почтой уже есть на этом устройстве");
+        if (exists(mail)) throw new AccountException("Такой аккаунт уже есть");
 
         String salt = PasswordHasher.newSalt();
         ContentValues v = new ContentValues();
@@ -46,18 +46,20 @@ public final class AccountRepository {
         v.put(JustPayDbHelper.A_ITER, PasswordHasher.ITERATIONS);
         v.put(JustPayDbHelper.A_HASH, PasswordHasher.hash(password, salt, PasswordHasher.ITERATIONS));
         v.put(JustPayDbHelper.A_CREATED, LocalDate.now().toString());
+        // Аккаунт создаётся только после отметок согласия, дату сохраняем
+        v.put(JustPayDbHelper.A_CONSENT, LocalDate.now().toString());
         long id = helper.getWritableDatabase().insert(JustPayDbHelper.T_ACCOUNTS, null, v);
         if (id < 0) throw new AccountException("Не удалось создать аккаунт");
         return find(id);
     }
 
-    /** Возвращает аккаунт, если почта и пароль верны, иначе null. */
+    /** Аккаунт, если почта и пароль верны, иначе null */
     public Account login(String email, String password) {
         SQLiteDatabase db = helper.getReadableDatabase();
         try (Cursor c = db.query(JustPayDbHelper.T_ACCOUNTS, null,
                 JustPayDbHelper.A_EMAIL + " = ?", new String[]{normalizeEmail(email)}, null, null, null)) {
             if (!c.moveToFirst()) {
-                // Считаем хеш и для несуществующей почты, чтобы ответ не выдавал, есть ли такой аккаунт
+                // Хеш считаем и для несуществующей почты, чтобы ответ не выдавал аккаунт
                 PasswordHasher.hash(password, PasswordHasher.newSalt(), PasswordHasher.ITERATIONS);
                 return null;
             }
@@ -85,7 +87,7 @@ public final class AccountRepository {
         }
     }
 
-    /** Удаляет аккаунт вместе с его подписками и статистикой (каскадом). */
+    /** Удаляет аккаунт вместе с подписками */
     public void delete(long id) {
         helper.getWritableDatabase().delete(JustPayDbHelper.T_ACCOUNTS,
                 JustPayDbHelper.A_ID + " = ?", new String[]{String.valueOf(id)});
@@ -99,11 +101,7 @@ public final class AccountRepository {
         updateColumn(id, JustPayDbHelper.A_CURRENCY, currency.name());
     }
 
-    /**
-     * Меняет валюту аккаунта и, если factor не равен 1, умножает на него цены всех его подписок.
-     * Всё выполняется одной транзакцией: либо меняется и валюта, и цены, либо ничего.
-     * Цена округляется до копеек и не опускается ниже одной копейки, чтобы остаться больше нуля.
-     */
+    /** Меняет валюту и умножает цены на factor, всё одной транзакцией */
     public void changeCurrency(long id, Currency currency, double factor) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
@@ -135,6 +133,7 @@ public final class AccountRepository {
         a.email = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_EMAIL));
         a.avatar = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_AVATAR));
         a.currency = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_CURRENCY));
+        a.consentDate = c.getString(c.getColumnIndexOrThrow(JustPayDbHelper.A_CONSENT));
         return a;
     }
 }

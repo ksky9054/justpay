@@ -25,12 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import ru.eridian.justpay.data.Currency;
 
-/**
- * Курсы валют Банка России (https://www.cbr.ru/scripts/XML_daily.asp). Один ответ содержит курс
- * каждой валюты к рублю, поэтому через рубль можно пересчитать любую пару валют приложения.
- * Запрос выполняется только когда пользователь меняет валюту и в аккаунте есть подписки;
- * серверу не передаётся ничего, кроме самого запроса.
- */
+/** Курсы валют Банка России, через рубль считается любая пара */
 public final class ExchangeRates {
     public static final String SOURCE_URL = "https://www.cbr.ru/scripts/XML_daily.asp";
     private static final int TIMEOUT_MS = 7000;
@@ -38,9 +33,9 @@ public final class ExchangeRates {
 
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
 
-    /** Сколько рублей стоит одна единица валюты. */
+    /** Рублей за единицу валюты */
     private final Map<String, Double> rubPerUnit;
-    /** Дата курса в формате ЦБ, например «28.10.2026». */
+    /** Дата курса */
     public final String date;
 
     ExchangeRates(Map<String, Double> rubPerUnit, String date) {
@@ -48,15 +43,15 @@ public final class ExchangeRates {
         this.date = date;
     }
 
-    /** Разбирает XML ЦБ РФ. Кодировка (windows-1251) берётся из заголовка документа. */
+    /** Разбирает XML Банка России */
     public static ExchangeRates parse(InputStream in) throws IOException {
         try {
             DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
             try {
-                // Внешние сущности не нужны: запрещаем DTD, где платформа это позволяет
+                // DTD не нужен, запрещаем
                 f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             } catch (Exception ignored) {
-                // На Android этот параметр может не поддерживаться, внешние сущности там и так не загружаются
+                // На Android параметра может не быть, это нормально
             }
             DocumentBuilder b = f.newDocumentBuilder();
             Document doc = b.parse(in);
@@ -88,7 +83,7 @@ public final class ExchangeRates {
         return n.getLength() == 0 ? null : n.item(0).getTextContent().trim();
     }
 
-    /** «80,5307» -> 80.5307; null, если число некорректно. */
+    /** «80,5307» -> 80.5307, при ошибке null */
     private static Double number(String s) {
         if (s == null) return null;
         try {
@@ -99,7 +94,7 @@ public final class ExchangeRates {
         }
     }
 
-    /** Скачивает и разбирает курсы. Вызывать не из главного потока. */
+    /** Скачивает курсы, вызывать не из главного потока */
     public static ExchangeRates fetch() throws IOException {
         HttpURLConnection c = (HttpURLConnection) new URL(SOURCE_URL).openConnection();
         c.setConnectTimeout(TIMEOUT_MS);
@@ -123,7 +118,7 @@ public final class ExchangeRates {
         }
     }
 
-    /** Загружает курсы в фоне; результат приходит в главном потоке. */
+    /** Загружает курсы в фоне, ответ приходит в главном потоке */
     public static void fetchAsync(Consumer<ExchangeRates> onOk, Runnable onFail) {
         Handler main = new Handler(Looper.getMainLooper());
         IO.execute(() -> {
@@ -131,7 +126,7 @@ public final class ExchangeRates {
             try {
                 r = fetch();
             } catch (IOException ignored) {
-                // Нет сети, таймаут или сервер недоступен: для пользователя это одно и то же
+                // Нет сети или сервер недоступен
             }
             final ExchangeRates result = r;
             main.post(() -> {
@@ -145,17 +140,18 @@ public final class ExchangeRates {
         return rubPerUnit.containsKey(a.name()) && rubPerUnit.containsKey(b.name());
     }
 
-    /** Во сколько раз умножить сумму в валюте from, чтобы получить сумму в валюте to. */
+    /** Множитель из валюты from в to */
     public double factor(Currency from, Currency to) {
+        if (!supports(from, to)) throw new IllegalArgumentException("Нет курса для " + from + " или " + to);
         return rubPerUnit.get(from.name()) / rubPerUnit.get(to.name());
     }
 
-    /** Сколько стоит одна единица валюты of, выраженная в валюте in. */
+    /** Цена одной единицы of в валюте in */
     public double rate(Currency of, Currency in) {
         return factor(of, in);
     }
 
-    /** Курс для показа пользователю: «1 € = 90,10 ₽» (для мелких курсов больше знаков). */
+    /** Курс для показа: «1 € = 90,10 ₽» */
     public String describe(Currency of, Currency in) {
         double r = rate(of, in);
         String num = String.format(Locale.US, r >= 1 ? "%.2f" : "%.4f", r).replace('.', ',');

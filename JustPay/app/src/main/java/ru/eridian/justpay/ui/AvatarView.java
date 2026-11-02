@@ -13,7 +13,7 @@ import android.widget.TextView;
 import ru.eridian.justpay.R;
 import ru.eridian.justpay.data.AvatarSpec;
 
-/** Круглый аватар: цветной круг с инициалами или знаком в стиле «Эридиан», либо фотография. */
+/** Круглый аватар: инициалы, знак или фото */
 public class AvatarView extends FrameLayout {
     private final TextView initials;
     private final ImageView glyph;
@@ -25,13 +25,13 @@ public class AvatarView extends FrameLayout {
 
     public AvatarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setClipToOutline(true); // контур берётся из круглого фона, фото обрезается по кругу
+        setClipToOutline(true); // фото обрезается по кругу
 
         initials = new TextView(context);
         initials.setGravity(Gravity.CENTER);
         initials.setIncludeFontPadding(false);
         initials.setTextColor(context.getColor(R.color.jp_ink));
-        initials.setTypeface(context.getResources().getFont(R.font.unbounded_medium));
+        initials.setTypeface(context.getResources().getFont(R.font.exo_bold));
         addView(initials, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
         glyph = new ImageView(context);
@@ -50,10 +50,7 @@ public class AvatarView extends FrameLayout {
         setAvatar(spec, initialsText, null);
     }
 
-    /**
-     * Рисует аватар. Для знака «Фото» нужна сама картинка; если её нет, показывается значок фото
-     * (так выглядит плитка выбора, пока фото ещё не выбрано).
-     */
+    /** Рисует аватар, без фото показывает значок фото */
     public void setAvatar(AvatarSpec spec, String initialsText, Bitmap photo) {
         GradientDrawable bg = new GradientDrawable();
         bg.setShape(GradientDrawable.OVAL);

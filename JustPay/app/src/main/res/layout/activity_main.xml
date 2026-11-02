@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/jpBg"
-    android:orientation="vertical">
+    android:background="?attr/jpBg">
 
     <FrameLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <ScrollView
         android:id="@+id/screen_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="76dp"
     android:fillViewport="true"
     android:overScrollMode="never"
     android:scrollbars="none">
@@ -47,6 +48,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:letterSpacing="-0.01"
+                android:fontFamily="@font/unbounded_medium"
                 android:text="JustPay"
                 android:textSize="17sp" />
 
@@ -74,7 +76,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="9dp"
                     android:background="@drawable/d_dot"
-                    android:backgroundTint="@color/jp_ac"
+                    android:backgroundTint="?attr/jpAc"
                     android:visibility="gone" />
             </FrameLayout>
         </LinearLayout>
@@ -128,7 +130,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:fontFamily="@font/manrope_regular" />
+                android:fontFamily="@font/plex_regular" />
 
             <LinearLayout
                 android:id="@+id/saved_pill"
@@ -148,7 +150,7 @@
                     android:layout_width="8dp"
                     android:layout_height="8dp"
                     android:background="@drawable/d_dot"
-                    android:backgroundTint="@color/jp_ac" />
+                    android:backgroundTint="?attr/jpAc" />
 
                 <TextView
                     android:id="@+id/saved_text"
@@ -323,6 +325,8 @@
         android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="76dp"
     android:overScrollMode="never"
     android:scrollbars="none">
 
@@ -512,6 +516,8 @@
         android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="76dp"
     android:overScrollMode="never"
     android:scrollbars="none">
 
@@ -558,7 +564,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/manrope_regular" />
+                android:fontFamily="@font/plex_regular" />
         </LinearLayout>
 
         <!-- Серия использования по всем подпискам -->
@@ -636,7 +642,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
                 android:lineSpacingMultiplier="1.15"
-                android:text="Звезда за день, когда вы пользовались хотя бы одной подпиской. Отмечать использование можно в карточке подписки." />
+                android:text="Звезда за день, когда вы пользовались подпиской." />
         </LinearLayout>
 
         <!-- Неиспользуемые подписки -->
@@ -812,6 +818,8 @@
         android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="76dp"
     android:overScrollMode="never"
     android:scrollbars="none">
 
@@ -940,6 +948,20 @@
                     android:text="Светлая"
                     android:textColor="@color/seg_text_s1" />
             </LinearLayout>
+
+            <TextView
+                style="@style/Jp.Semi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Цвет акцента"
+                android:textSize="15sp" />
+
+            <ru.eridian.justpay.ui.FlowLayout
+                android:id="@+id/accent_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
         </LinearLayout>
 
         <!-- Напоминания -->
@@ -982,9 +1004,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Уведомление в 09:00, если для подписки не задана своя дата"
+                        android:text="В 09:00, если у подписки нет своей даты"
                         android:textColor="?attr/jpTx2"
                         android:textSize="13sp" />
+
                 </LinearLayout>
 
                 <Switch
@@ -1083,9 +1106,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Вечером в 20:00, если сегодня ещё нет отметки, а серию можно потерять"
+                        android:text="В 20:00, если сегодня нет отметки"
                         android:textColor="?attr/jpTx2"
                         android:textSize="13sp" />
+
                 </LinearLayout>
 
                 <Switch
@@ -1126,9 +1150,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Не чаще раза в неделю, в 12:00: чем не пользуетесь больше двух недель"
+                        android:text="Раз в неделю в 12:00, если подписка не используется две недели"
                         android:textColor="?attr/jpTx2"
                         android:textSize="13sp" />
+
                 </LinearLayout>
 
                 <Switch
@@ -1202,9 +1227,10 @@
                 android:layout_height="wrap_content"
                 android:lineSpacingMultiplier="1.15"
                 android:padding="16dp"
-                android:text="Нужен, чтобы считать, сколько раз вы открывали приложения своих сервисов. JustPay читает данные только тех приложений, которые вы сами привязали к подписке, и хранит их на телефоне. Без доступа можно отмечать использование вручную."
+                android:text="Нужен, чтобы считать открытия приложений ваших сервисов."
                 android:textColor="?attr/jpTx2"
                 android:textSize="13sp" />
+
         </LinearLayout>
 
         <!-- Оплата -->
@@ -1268,118 +1294,7 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="16dp"
-                android:text="Способы оплаты появятся здесь, когда вы укажете их в подписках. Номера карт вводить не нужно." />
-        </LinearLayout>
-
-        <!-- О приложении -->
-        <TextView
-            style="@style/Jp.Section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="О приложении" />
-
-        <LinearLayout
-            style="@style/Jp.Card.Divided"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    style="@style/Jp.Semi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Как считаются расходы"
-                    android:textSize="15sp" />
-
-                <TextView
-                    style="@style/Jp.Text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:lineSpacingMultiplier="1.15"
-                    android:text="В сумму входят только активные подписки. Годовая цена делится на 12, недельная умножается на 52 и делится на 12. Приостановленные подписки считаются экономией."
-                    android:textColor="?attr/jpTx2"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    style="@style/Jp.Semi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Серия использования"
-                    android:textSize="15sp" />
-
-                <TextView
-                    style="@style/Jp.Text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:lineSpacingMultiplier="1.15"
-                    android:text="Звезда за каждый день, когда вы пользовались подпиской: данные приложения или ручная отметка. Серия — это дни подряд. Если сегодня отметки ещё нет, серия не прерывается до конца дня."
-                    android:textColor="?attr/jpTx2"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    style="@style/Jp.Semi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ваши данные"
-                    android:textSize="15sp" />
-
-                <TextView
-                    style="@style/Jp.Text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:lineSpacingMultiplier="1.15"
-                    android:text="Аккаунт, подписки и статистика хранятся только на устройстве. JustPay не списывает деньги и не подключается к банкам: он лишь показывает, что и когда спишут сервисы."
-                    android:textColor="?attr/jpTx2"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/row_onboarding"
-                style="@style/Jp.Row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    style="@style/Jp.Semi"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Показать знакомство заново"
-                    android:textSize="15sp" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="12dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_chevron_right" />
-            </LinearLayout>
+                android:text="Способы оплаты появятся из ваших подписок." />
         </LinearLayout>
 
         <!-- Аккаунт -->
@@ -1422,6 +1337,128 @@
                 android:textSize="15sp" />
         </LinearLayout>
 
+        <!-- Документы -->
+        <TextView
+            style="@style/Jp.Section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Документы" />
+
+        <LinearLayout
+            style="@style/Jp.Card.Divided"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+
+            <LinearLayout
+                android:id="@+id/row_doc_terms"
+                style="@style/Jp.Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Пользовательское соглашение"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_doc_privacy"
+                style="@style/Jp.Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Политика обработки данных"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_doc_consent"
+                style="@style/Jp.Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/Jp.Semi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Согласие на обработку данных"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- О приложении -->
+        <TextView
+            style="@style/Jp.Section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="О приложении" />
+
+        <LinearLayout
+            android:id="@+id/row_onboarding"
+            style="@style/Jp.Row"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/d_card_ripple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                style="@style/Jp.Semi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Показать знакомство заново"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron_right" />
+        </LinearLayout>
+
+
         <!-- Подвал -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -1455,103 +1492,115 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="JustPay 1.0 · продукт компании «Эридиан»" />
+                android:text="JustPay 1.0, компания «Эридиан»" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
 
-        <ImageView
-            android:id="@+id/fab"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/d_fab_ripple"
-            android:clickable="true"
-            android:contentDescription="Добавить подписку"
-            android:elevation="8dp"
-            android:focusable="true"
-            android:scaleType="center"
-            android:src="@drawable/ic_plus" />
     </FrameLayout>
 
-    <View
+    <ru.eridian.justpay.ui.BlurBar
+        android:id="@+id/blur_bar"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/jpLine" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="68dp"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/nav_home"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
-            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
-                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
-                    android:src="@drawable/ic_nav_home" android:importantForAccessibility="no" />
-            </FrameLayout>
-            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" android:text="Главная" android:textColor="@color/nav_tint" android:textSize="12sp" />
-        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/jpLine" />
 
         <LinearLayout
-            android:id="@+id/nav_cal"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
-            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
-                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
-                    android:src="@drawable/ic_nav_cal" android:importantForAccessibility="no" />
-            </FrameLayout>
-            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" android:text="Календарь" android:textColor="@color/nav_tint" android:textSize="12sp" />
-        </LinearLayout>
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/nav_stats"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
-            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
-                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
-                    android:src="@drawable/ic_nav_stats" android:importantForAccessibility="no" />
-            </FrameLayout>
-            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" android:text="Аналитика" android:textColor="@color/nav_tint" android:textSize="12sp" />
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/nav_home"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+                <FrameLayout android:layout_width="52dp" android:layout_height="28dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                        android:src="@drawable/ic_nav_home" android:importantForAccessibility="no" />
+                </FrameLayout>
+                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="Главная" android:textColor="@color/nav_tint" android:textSize="12sp" />
+            </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/nav_profile"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
-            <FrameLayout android:layout_width="52dp" android:layout_height="28dp" android:background="@drawable/d_nav_pill">
-                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
-                    android:src="@drawable/ic_nav_profile" android:importantForAccessibility="no" />
+            <LinearLayout
+                android:id="@+id/nav_cal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+                <FrameLayout android:layout_width="52dp" android:layout_height="28dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                        android:src="@drawable/ic_nav_cal" android:importantForAccessibility="no" />
+                </FrameLayout>
+                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="Календарь" android:textColor="@color/nav_tint" android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Кнопка «добавить» в центре нижней панели -->
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/fab"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/d_fab_ripple"
+                    android:clickable="true"
+                    android:contentDescription="Добавить подписку"
+                    android:focusable="true"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_plus" />
             </FrameLayout>
-            <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" android:text="Профиль" android:textColor="@color/nav_tint" android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/nav_stats"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+                <FrameLayout android:layout_width="52dp" android:layout_height="28dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                        android:src="@drawable/ic_nav_stats" android:importantForAccessibility="no" />
+                </FrameLayout>
+                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="Аналитика" android:textColor="@color/nav_tint" android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/nav_profile"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+                <FrameLayout android:layout_width="52dp" android:layout_height="28dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center"
+                        android:src="@drawable/ic_nav_profile" android:importantForAccessibility="no" />
+                </FrameLayout>
+                <TextView style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="Профиль" android:textColor="@color/nav_tint" android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+    </ru.eridian.justpay.ui.BlurBar>
+</FrameLayout>

@@ -1,3 +1,7 @@
+# ВСЕ ПОСЛЕДНИЕ ПРАВКИ ПРОГРАММЫ НАХОДЯТСЯ В ЭТОМ BRANCH
+# ЕСЛИ У ВАС ЕСТЬ КАКИЕ ЛИБО ВОПРОСЫ ЗАДАВАЙТЕ В ЛС
+
+
 # JustPay - учёт цифровых подписок
 
 Учебное приложение компании «Эридиан» (проект «Студенческий Android стартап»).
@@ -79,7 +83,8 @@ Kotlin, Compose, WebView и сторонние библиотеки не исп�
 
 Вход настоящий, но локальный: аккаунты существуют только на этом телефоне и никуда не отправляются.
 
-- **Регистрация:** имя, электронная почта (не проверяется), пароль не короче 6 символов с повтором.
+- **Регистрация:** имя, электронная почта (не проверяется), пароль не короче 6 символов с повтором и три отметки: пользовательское соглашение, политика обработки персональных данных и согласие на обработку. Без всех трёх аккаунт не создаётся, дата согласия сохраняется в аккаунте.
+- **Документы:** тексты лежат в `res/raw` (`doc_terms.txt`, `doc_privacy.txt`, `doc_consent.txt`), открываются на экране `LegalActivity` по ссылкам при регистрации и из профиля (раздел «Документы»). Отозвать согласие можно удалением аккаунта в профиле. Тексты учебные, перед реальным запуском их должен проверить юрист.
 - **Хранение пароля:** в базе лежат соль и хеш PBKDF2-HMAC-SHA256 (120 000 итераций, своя соль у каждого
   аккаунта), сам пароль не сохраняется, восстановить его нельзя (`PasswordHasher`, `AccountRepository`).
 - **Вход:** неверная почта и неверный пароль дают одинаковый ответ; после 5 неудачных попыток вход
@@ -91,10 +96,10 @@ Kotlin, Compose, WebView и сторонние библиотеки не исп�
   Подписки, способы оплаты (просто подпись вроде «Основная карта», без номера) и отметки пользователь
   добавляет сам.
 
-Таблицы SQLite (`JustPayDbHelper`, версия 4, включены внешние ключи):
+Таблицы SQLite (`JustPayDbHelper`, версия 5, включены внешние ключи):
 
 ```
-accounts       _id, name, email (уникальна), pwd_hash, salt, iterations, created_at, avatar, currency
+accounts       _id, name, email (уникальна), pwd_hash, salt, iterations, created_at, avatar, currency, consent_date
 subscriptions  _id, account_id -> accounts, name, mark, price, cycle, next_date, prev_date, category,
                status, card, since, remind_days, app_package, created_at
 usage_days     sub_id -> subscriptions, day, auto_opens, auto_seconds, manual   (ключ: sub_id + day)
@@ -212,7 +217,7 @@ app/src/main/res/   layout, drawable (векторные иконки и лог�
 
 ## Известные отличия от дизайна
 
-- Шрифты Manrope (текст) и Unbounded (крупные цифры и заголовки) лежат в `res/font` и подключены
+- Шрифты IBM Plex Sans (текст) и Exo 2 (крупные цифры и заголовки) лежат в `res/font` и подключены
   в стилях `Jp.Text`, `Jp.Semi`, `Jp.Bold`, `Jp.Disp`. Это вариативные шрифты: нужное начертание
   задаётся через `fontVariationSettings` в `res/font/*.xml`.
 - Добавлены поле поиска и кнопка «Изменить»: их требует Положение, в макете их не было.
@@ -227,8 +232,10 @@ app/src/main/res/   layout, drawable (векторные иконки и лог�
 | Логотип JustPay, знак «Эридиан» | авторский макет команды |
 | Gradle Wrapper | Gradle Inc., Apache License 2.0 |
 | Курсы валют | Банк России, официальные курсы, `https://www.cbr.ru/scripts/XML_daily.asp`. Данные запрашиваются при смене валюты и не сохраняются. Перед коммерческим запуском нужно проверить условия использования данных ЦБ РФ |
-| Шрифт Manrope | The Manrope Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/manrope`), текст лицензии: `licenses/Manrope-OFL.txt` |
-| Шрифт Unbounded | The Unbounded Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/unbounded`), текст лицензии: `licenses/Unbounded-OFL.txt` |
+| Шрифт IBM Plex Sans | IBM Corp., SIL OFL 1.1, источник: github.com/google/fonts (`ofl/ibmplexsans`), текст лицензии: `licenses/IBMPlexSans-OFL.txt` |
+| Шрифт Exo 2 | The Exo 2 Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/exo2`), текст лицензии: `licenses/Exo2-OFL.txt` |
+| Шрифт Manrope (запасной, сейчас не используется) | The Manrope Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/manrope`), текст лицензии: `licenses/Manrope-OFL.txt` |
+| Шрифт Unbounded (надпись логотипа) | The Unbounded Project Authors, SIL OFL 1.1, источник: github.com/google/fonts (`ofl/unbounded`), текст лицензии: `licenses/Unbounded-OFL.txt` |
 
 Сторонних библиотек в приложении нет. Шрифты распространяются вместе с приложением по условиям OFL:
 файлы не изменялись, текст лицензии приложен.

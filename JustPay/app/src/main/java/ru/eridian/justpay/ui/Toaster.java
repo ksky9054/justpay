@@ -7,14 +7,14 @@ import android.widget.TextView;
 
 import ru.eridian.justpay.R;
 
-/** Короткое сообщение внизу экрана, как в дизайне. */
+/** Короткое сообщение внизу */
 public final class Toaster {
     private Toaster() {}
 
     private static String pending;
-    private static final int TAG = R.id.root;
+    private static final int TAG = R.id.toast_tag;
 
-    /** Запоминает сообщение, чтобы показать его на экране, к которому вернёмся. */
+    /** Запоминает сообщение для следующего экрана */
     public static void post(String message) {
         pending = message;
     }
