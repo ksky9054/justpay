@@ -567,6 +567,100 @@
                 android:fontFamily="@font/plex_regular" />
         </LinearLayout>
 
+        <!-- Месячный бюджет и сводная аналитика -->
+        <LinearLayout
+            style="@style/Jp.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    style="@style/Jp.Bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Месячный бюджет"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/st_budget_edit"
+                    style="@style/Jp.Semi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp"
+                    android:text="Изменить"
+                    android:textColor="?attr/jpAct"
+                    android:textSize="13sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/st_budget_amount"
+                style="@style/Jp.Disp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Лимит не задан"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/st_budget_caption"
+                style="@style/Jp.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Задайте бюджет, чтобы контролировать расходы на подписки" />
+            <ProgressBar
+                android:id="@+id/st_budget_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginTop="12dp"
+                android:max="100"
+                android:progress="0" />
+            <TextView
+                android:id="@+id/st_budget_remaining"
+                style="@style/Jp.Semi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Настроить месячный лимит"
+                android:textSize="13sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="14dp"
+                android:background="?attr/jpLine" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/Jp.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="В среднем за день" />
+                    <TextView android:id="@+id/st_daily_average" style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView style="@style/Jp.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Прогноз на год" />
+                    <TextView android:id="@+id/st_annual_forecast" style="@style/Jp.Semi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- Серия использования по всем подпискам -->
         <LinearLayout
             style="@style/Jp.Card"
@@ -1430,6 +1524,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="О приложении" />
+
+        <LinearLayout
+            android:id="@+id/row_export"
+            style="@style/Jp.Row"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/d_card_ripple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                style="@style/Jp.Semi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Экспорт подписок в CSV"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron_right" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/row_onboarding"
