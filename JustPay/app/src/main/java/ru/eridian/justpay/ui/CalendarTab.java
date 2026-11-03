@@ -71,32 +71,52 @@ final class CalendarTab {
         });
     }
 
-    void refresh() {
-        LocalDate today = LocalDate.now();
-        LocalDate first = today.withDayOfMonth(1).plusMonths(monthOffset);
+    /** Рассчитывает дни платежей для месяца first */
+    static Map<Integer, List<Subscription>> computeOccurrences(List<Subscription> subs, LocalDate first, LocalDate today) {
         int y = first.getYear(), m = first.getMonthValue(), dim = first.lengthOfMonth();
-
         Map<Integer, List<Subscription>> occ = new HashMap<>();
-        for (Subscription s : a.repo.all()) {
-            if (!s.isActive() || s.next == null) continue;
+        if (subs == null) return occ;
+
+        for (Subscription s : subs) {
+            if (s == null || !s.isActive() || s.next == null) continue;
             LocalDate nd = s.next;
             if (Subscription.CYCLE_MONTH.equals(s.cycle)) {
                 int day = Math.min(nd.getDayOfMonth(), dim);
                 LocalDate dt = LocalDate.of(y, m, day);
-                // В будущем месяце до ближайшего списания ещё не списывали
-                if (!(!dt.isBefore(today) && dt.isBefore(nd))) add(occ, day, s);
+                // В будущем месяце до ближайшего списания ещё не списывали, а раньше создания подписки списаний не было
+                if (!(!dt.isBefore(today) && dt.isBefore(nd)) && !dt.isBefore(s.createdAt)) {
+                    add(occ, day, s);
+                }
             } else if (Subscription.CYCLE_YEAR.equals(s.cycle)) {
-                if (nd.getMonthValue() == m && nd.getYear() == y) add(occ, nd.getDayOfMonth(), s);
+                if (nd.getMonthValue() == m) {
+                    int day = Math.min(nd.getDayOfMonth(), dim);
+                    LocalDate dt = LocalDate.of(y, m, day);
+                    if (!(!dt.isBefore(today) && dt.isBefore(nd)) && !dt.isBefore(s.createdAt)) {
+                        add(occ, day, s);
+                    }
+                }
             } else {
+                // Еженедельная подписка: выравниваем дату t на первое появление в месяце first
                 LocalDate t = nd;
-                while (!t.isBefore(first)) t = t.minusDays(7);
-                t = t.plusDays(7);
+                while (t.isAfter(first)) t = t.minusDays(7);
+                while (t.isBefore(first)) t = t.plusDays(7);
                 while (t.getMonthValue() == m && t.getYear() == y) {
-                    if (!t.isBefore(nd) || t.isBefore(today)) add(occ, t.getDayOfMonth(), s);
+                    if ((!t.isBefore(nd) || t.isBefore(today)) && !t.isBefore(s.createdAt)) {
+                        add(occ, t.getDayOfMonth(), s);
+                    }
                     t = t.plusDays(7);
                 }
             }
         }
+        return occ;
+    }
+
+    void refresh() {
+        LocalDate today = LocalDate.now();
+        LocalDate first = today.withDayOfMonth(1).plusMonths(monthOffset);
+        int y = first.getYear(), m = first.getMonthValue();
+
+        Map<Integer, List<Subscription>> occ = computeOccurrences(a.repo.all(), first, today);
 
         // Выбран сохранённый день, иначе ближайший с платежом
         List<Integer> days = new ArrayList<>(occ.keySet());

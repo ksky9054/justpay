@@ -35,6 +35,9 @@ public final class ReminderScheduler {
     /** Пересчитывает ближайшее напоминание */
     public static void reschedule(Context context) {
         Context app = context.getApplicationContext();
+        // Сначала переносим просроченные списания, чтобы не пропустить будущие периоды
+        SubscriptionRepository.get(app).rollForward(LocalDate.now(), false);
+
         AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
         if (am == null) return;
         PendingIntent pi = alarmIntent(app);
