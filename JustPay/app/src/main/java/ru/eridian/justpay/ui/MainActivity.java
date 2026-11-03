@@ -16,6 +16,8 @@ public class MainActivity extends BaseActivity {
     private static final String STATE_FILTER = "filter";
     /** Код запроса выбора фото */
     static final int REQ_PHOTO = 41;
+    /** Код запроса системного диалога сохранения CSV. */
+    static final int REQ_EXPORT = 42;
     /** Вкладка из уведомления: 0 главная, 1 календарь, 2 аналитика, 3 профиль */
     public static final String EXTRA_TAB = "tab";
 
@@ -128,6 +130,10 @@ public class MainActivity extends BaseActivity {
         if (requestCode == REQ_PHOTO && resultCode == RESULT_OK && data != null
                 && data.getData() != null && profile != null) {
             profile.onPhotoPicked(data.getData());
+        }
+        if (requestCode == REQ_EXPORT && resultCode == RESULT_OK && data != null
+                && data.getData() != null && profile != null) {
+            profile.onExportPicked(data.getData());
         }
     }
 
