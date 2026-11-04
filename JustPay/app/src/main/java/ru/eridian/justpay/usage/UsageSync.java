@@ -27,6 +27,8 @@ public final class UsageSync {
     private static final int WINDOW_DAYS = 7;
     /** Возврат быстрее этого срока считаем тем же открытием */
     private static final long SAME_LAUNCH_GAP_MS = 15_000;
+    /** Максимум 6 часов на одну непрерывную сессию (защита от пропущенных событий выгрузки ОС) */
+    private static final int MAX_SESSION_SECONDS = 6 * 3600;
     // События: 1 - приложение на экране, 2 - ушло с экрана
     private static final int EVENT_FOREGROUND = 1;
     private static final int EVENT_BACKGROUND = 2;
@@ -115,7 +117,8 @@ public final class UsageSync {
             }
         } else if (type == EVENT_BACKGROUND) {
             if (c.fgSince >= 0) {
-                bucket(c, c.fgSince, zone).seconds += (int) ((ts - c.fgSince) / 1000);
+                int duration = (int) Math.min((ts - c.fgSince) / 1000, MAX_SESSION_SECONDS);
+                if (duration > 0) bucket(c, c.fgSince, zone).seconds += duration;
                 c.fgSince = -1;
                 c.lastPause = ts;
             }
@@ -125,7 +128,8 @@ public final class UsageSync {
     static void finish(Counter c, long end, ZoneId zone) {
         // Приложение всё ещё на экране
         if (c.fgSince >= 0) {
-            bucket(c, c.fgSince, zone).seconds += (int) ((end - c.fgSince) / 1000);
+            int duration = (int) Math.min((end - c.fgSince) / 1000, MAX_SESSION_SECONDS);
+            if (duration > 0) bucket(c, c.fgSince, zone).seconds += duration;
             c.fgSince = -1;
         }
     }

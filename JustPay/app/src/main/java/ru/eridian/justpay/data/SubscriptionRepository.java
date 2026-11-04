@@ -84,16 +84,22 @@ public final class SubscriptionRepository {
                 new String[]{String.valueOf(s.id), String.valueOf(account())});
     }
 
-    /** Переносит прошедшую дату списания на следующий период */
+    /** Переносит прошедшую дату списания на следующий период и обновляет напоминания */
     public void rollForward(LocalDate today) {
+        rollForward(today, true);
+    }
+
+    /** Переносит прошедшую дату списания на следующий период с сохранением дня месяца */
+    public boolean rollForward(LocalDate today, boolean notifyScheduler) {
         boolean changed = false;
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
             for (Subscription s : all()) {
                 if (s.isActive() && s.next != null && s.next.isBefore(today)) {
+                    int anchor = Math.max(s.next.getDayOfMonth(), s.prev != null ? s.prev.getDayOfMonth() : 0);
                     s.prev = s.next;
-                    s.next = Subscription.advance(s.next, s.cycle, today, true);
+                    s.next = Subscription.advance(s.next, s.cycle, today, true, anchor);
                     write(s);
                     changed = true;
                 }
@@ -102,7 +108,8 @@ public final class SubscriptionRepository {
         } finally {
             db.endTransaction();
         }
-        if (changed) ReminderScheduler.reschedule(appContext);
+        if (changed && notifyScheduler) ReminderScheduler.reschedule(appContext);
+        return changed;
     }
 
     private static ContentValues values(Subscription s) {
