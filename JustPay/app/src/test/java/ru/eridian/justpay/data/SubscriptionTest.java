@@ -74,4 +74,37 @@ public class SubscriptionTest {
         LocalDate mayNext = Subscription.advance(aprNext, Subscription.CYCLE_MONTH, LocalDate.of(2026, 5, 1), true, 31);
         assertEquals(LocalDate.of(2026, 5, 31), mayNext);
     }
+
+    @Test
+    public void advance_resumingPreservesBillingDay() {
+        // Подписка списывалась 5 числа, возобновляем 20 числа -> списание должно быть 5 числа следующего месяца, а не 20
+        LocalDate prev = LocalDate.of(2026, 11, 5);
+        LocalDate today = LocalDate.of(2026, 11, 20);
+        int anchor = prev.getDayOfMonth();
+        LocalDate resume = Subscription.advance(prev, Subscription.CYCLE_MONTH, today, false, anchor);
+        assertEquals(LocalDate.of(2026, 12, 5), resume);
+    }
+
+    @Test
+    public void shift_yearlyPreservesLeapYearAnchor() {
+        LocalDate leapDate = LocalDate.of(2024, 2, 29);
+        LocalDate nextYear = Subscription.shift(leapDate, Subscription.CYCLE_YEAR, 1, 29);
+        assertEquals(LocalDate.of(2025, 2, 28), nextYear);
+
+        LocalDate fourYears = Subscription.shift(leapDate, Subscription.CYCLE_YEAR, 4, 29);
+        assertEquals(LocalDate.of(2028, 2, 29), fourYears);
+    }
+
+    @Test
+    public void advance_multiMonthCatchUpPreservesRecentPastAndAnchor() {
+        // Подписка на 31 число просрочена на 3 месяца (была 31 января, сегодня 15 апреля)
+        LocalDate jan31 = LocalDate.of(2026, 1, 31);
+        LocalDate today = LocalDate.of(2026, 4, 15);
+        int anchor = 31;
+        LocalDate newNext = Subscription.advance(jan31, Subscription.CYCLE_MONTH, today, true, anchor);
+        assertEquals(LocalDate.of(2026, 4, 30), newNext);
+
+        LocalDate lastPast = Subscription.shift(newNext, Subscription.CYCLE_MONTH, -1, anchor);
+        assertEquals(LocalDate.of(2026, 3, 31), lastPast);
+    }
 }

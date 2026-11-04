@@ -98,8 +98,9 @@ public final class SubscriptionRepository {
             for (Subscription s : all()) {
                 if (s.isActive() && s.next != null && s.next.isBefore(today)) {
                     int anchor = Math.max(s.next.getDayOfMonth(), s.prev != null ? s.prev.getDayOfMonth() : 0);
-                    s.prev = s.next;
-                    s.next = Subscription.advance(s.next, s.cycle, today, true, anchor);
+                    LocalDate newNext = Subscription.advance(s.next, s.cycle, today, true, anchor);
+                    s.prev = Subscription.shift(newNext, s.cycle, -1, anchor);
+                    s.next = newNext;
                     write(s);
                     changed = true;
                 }

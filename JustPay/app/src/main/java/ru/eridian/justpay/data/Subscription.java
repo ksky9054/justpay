@@ -75,7 +75,14 @@ public class Subscription {
 
     /** Сдвигает дату на k периодов с сохранением желаемого дня месяца (например, 31 числа) */
     public static LocalDate shift(LocalDate base, String cycle, int k, int anchorDay) {
-        if (CYCLE_YEAR.equals(cycle)) return base.plusYears(k);
+        if (CYCLE_YEAR.equals(cycle)) {
+            LocalDate target = base.plusYears(k);
+            if (anchorDay > 0) {
+                int dim = target.lengthOfMonth();
+                return target.withDayOfMonth(Math.min(anchorDay, dim));
+            }
+            return target;
+        }
         if (CYCLE_WEEK.equals(cycle)) return base.plusWeeks(k);
         LocalDate target = base.plusMonths(k);
         if (anchorDay > 0) {
