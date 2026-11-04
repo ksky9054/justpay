@@ -1,13 +1,17 @@
 package ru.eridian.justpay.ui;
 
+import android.app.AlertDialog;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.text.InputType;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.eridian.justpay.R;
+import ru.eridian.justpay.data.BudgetAnalytics;
 import ru.eridian.justpay.data.Subscription;
 import ru.eridian.justpay.data.UsageDay;
 import ru.eridian.justpay.data.UsageInsights;
@@ -35,6 +40,9 @@ final class StatsTab {
     private final LinearLayout bar, catList, top;
     private final ImageView star;
     private final TextView streak, streakLabel, best, unusedSub;
+    private final TextView budgetAmount, budgetCaption, budgetRemaining, dailyAverage, annualForecast;
+    private final ProgressBar budgetProgress;
+    private final View budgetEdit;
     private final LinearLayout week, unusedList;
     private final View unusedCard;
 
@@ -57,6 +65,14 @@ final class StatsTab {
         bar = screen.findViewById(R.id.st_bar);
         catList = screen.findViewById(R.id.st_cat_list);
         top = screen.findViewById(R.id.st_top);
+        budgetAmount = screen.findViewById(R.id.st_budget_amount);
+        budgetCaption = screen.findViewById(R.id.st_budget_caption);
+        budgetRemaining = screen.findViewById(R.id.st_budget_remaining);
+        dailyAverage = screen.findViewById(R.id.st_daily_average);
+        annualForecast = screen.findViewById(R.id.st_annual_forecast);
+        budgetProgress = screen.findViewById(R.id.st_budget_progress);
+        budgetEdit = screen.findViewById(R.id.st_budget_edit);
+        budgetEdit.setOnClickListener(v -> editBudget());
 
         GradientDrawable clip = new GradientDrawable();
         clip.setCornerRadius(Ui.dp(a, 7));
@@ -116,6 +132,70 @@ final class StatsTab {
         }
     }
 
+    private void editBudget() {
+        EditText input = new EditText(a);
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        double current = a.prefs.monthlyBudget();
+        input.setText(current > 0 ? java.math.BigDecimal.valueOf(current).stripTrailingZeros().toPlainString() : "");
+        input.setHint("Например, 5000");
+        input.setPadding(Ui.dp(a, 16), Ui.dp(a, 12), Ui.dp(a, 16), Ui.dp(a, 12));
+
+        LinearLayout container = new LinearLayout(a);
+        container.setPadding(Ui.dp(a, 24), Ui.dp(a, 8), Ui.dp(a, 24), 0);
+        container.addView(input, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        AlertDialog dialog = new AlertDialog.Builder(a)
+                .setTitle("Месячный бюджет")
+                .setMessage("Укажите максимальную сумму расходов на подписки в валюте аккаунта. Введите 0, чтобы отключить лимит.")
+                .setView(container)
+                .setNegativeButton("Отмена", null)
+                .setNeutralButton("Сбросить", (d, w) -> {
+                    a.prefs.setMonthlyBudget(0d);
+                    refresh();
+                })
+                .setPositiveButton("Сохранить", null)
+                .create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String raw = input.getText().toString().trim().replace(',', '.');
+            try {
+                double value = raw.isEmpty() ? 0d : Double.parseDouble(raw);
+                if (!Double.isFinite(value) || value < 0d) throw new NumberFormatException();
+                a.prefs.setMonthlyBudget(value);
+                dialog.dismiss();
+                refresh();
+            } catch (NumberFormatException ex) {
+                input.setError("Введите корректную сумму");
+            }
+        }));
+        dialog.show();
+    }
+
+    private void bindBudget(double monthly, int daysInMonth) {
+        double budget = a.prefs.monthlyBudget();
+        dailyAverage.setText(Fmt.money(BudgetAnalytics.dailyAverage(monthly, daysInMonth)) + " в день");
+        annualForecast.setText(Fmt.money(BudgetAnalytics.yearlyForecast(monthly)) + " в год");
+        if (budget <= 0d) {
+            budgetAmount.setText("Лимит не задан");
+            budgetCaption.setText("Задайте бюджет, чтобы контролировать расходы на подписки");
+            budgetRemaining.setText("Настроить месячный лимит");
+            budgetProgress.setProgress(0);
+            budgetRemaining.setTextColor(Ui.attr(a, R.attr.jpAct));
+            return;
+        }
+        double remaining = BudgetAnalytics.remaining(budget, monthly);
+        boolean over = BudgetAnalytics.isOverBudget(budget, monthly);
+        int progress = (int) Math.round(BudgetAnalytics.progressPercent(budget, monthly));
+        budgetAmount.setText(Fmt.money(monthly) + " / " + Fmt.money(budget));
+        budgetCaption.setText(progress + "% месячного бюджета использовано");
+        budgetRemaining.setText(over
+                ? "Превышение на " + Fmt.money(monthly - budget)
+                : "Осталось " + Fmt.money(remaining));
+        budgetRemaining.setTextColor(Ui.attr(a, over ? R.attr.jpAc : R.attr.jpAct));
+        budgetProgress.setProgress(progress);
+    }
+
     void refresh() {
         List<Subscription> all = a.repo.all();
         List<Subscription> active = new ArrayList<>();
@@ -132,6 +212,8 @@ final class StatsTab {
         }
 
         bindActivity(all);
+        java.time.YearMonth currentMonth = java.time.YearMonth.now();
+        bindBudget(total, currentMonth.lengthOfMonth());
 
         year.setText(Fmt.money(total * 12));
         sub.setText(Fmt.money(total) + " в месяц - " + Fmt.money(total * 12 / 365) + " в день");
