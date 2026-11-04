@@ -29,7 +29,7 @@ public final class Fmt {
         return sb.toString();
     }
 
-    private static Currency currency = Currency.RUB;
+    private static volatile Currency currency = Currency.RUB;
 
     /** Текущая валюта (аккаунта) */
     public static void setCurrency(Currency c) {

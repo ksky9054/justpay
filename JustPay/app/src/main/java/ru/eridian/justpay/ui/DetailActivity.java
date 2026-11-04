@@ -30,7 +30,7 @@ public class DetailActivity extends BaseActivity {
         setContentView(R.layout.activity_detail);
         Ui.fitSystemBars(findViewById(R.id.root));
         interceptBack();
-        id =getIntent().getLongExtra(EXTRA_ID, 0);
+        id = getIntent().getLongExtra(EXTRA_ID, 0);
 
         pill = findViewById(R.id.pill_status);
         name = findViewById(R.id.d_name);
@@ -186,7 +186,8 @@ public class DetailActivity extends BaseActivity {
                     });
         } else {
             LocalDate base = s.prev != null ? s.prev : today();
-            LocalDate resume = Subscription.advance(base, s.cycle, today(), false);
+            int anchor = Math.max(s.prev != null ? s.prev.getDayOfMonth() : 0, today().getDayOfMonth());
+            LocalDate resume = Subscription.advance(base, s.cycle, today(), false, anchor);
             ConfirmSheet.show(this, "Возобновить «" + s.name + "»?", R.layout.sheet_body_confirm, body -> {
                 ((TextView) body.findViewById(R.id.b_title)).setText("Добавится к расходам");
                 TextView monthTv = body.findViewById(R.id.b_month);
