@@ -27,7 +27,7 @@ public final class SubscriptionCsvExporter {
             appendRow(csv, safeText(subscription.name), safeText(subscription.category),
                     subscription.isActive() ? "Активна" : "Приостановлена", price,
                     safeCurrency.name(), cycleLabel(subscription.cycle),
-                    subscription.next == null ? "" : subscription.next.toString(),
+                    subscription.isActive() && subscription.next != null ? subscription.next.toString() : "",
                     subscription.prev == null ? "" : subscription.prev.toString(),
                     safeText(subscription.card));
         }
