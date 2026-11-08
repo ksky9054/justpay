@@ -83,7 +83,7 @@ public class EditActivity extends BaseActivity {
             fPrice.setText(trimZeros(editing.price));
             cycle = editing.cycle;
             category = editing.category;
-            if (editing.next != null) date = editing.next;
+            if (editing.isActive() && editing.next != null) date = editing.next;
             else {
                 // У паузы нет ни даты списания, ни напоминания
                 findViewById(R.id.date_block).setVisibility(View.GONE);
@@ -246,7 +246,7 @@ public class EditActivity extends BaseActivity {
     }
 
     private boolean hasRemindBlock() {
-        return editing == null || editing.next != null;
+        return editing == null || editing.isActive();
     }
 
     private LocalDate customRemindDate() {
@@ -356,7 +356,7 @@ public class EditActivity extends BaseActivity {
         else if (p > MAX_PRICE) priceErr = "Сумма не больше " + Fmt.price(MAX_PRICE);
 
         String dateErr = null;
-        boolean needsDate = editing == null || editing.next != null;
+        boolean needsDate = editing == null || editing.isActive();
         // Старую дату не ругаем: после полуночи она могла стать вчерашней
         boolean dateUnchanged = editing != null && date.equals(editing.next);
         if (needsDate && !dateUnchanged && date.isBefore(today())) dateErr = "Дата в прошлом";
@@ -423,7 +423,7 @@ public class EditActivity extends BaseActivity {
             editing.cycle = cycle;
             editing.category = category;
             editing.card = fCard.getText().toString().trim();
-            if (editing.next != null) {
+            if (editing.isActive() && editing.next != null) {
                 // Дата сменилась: напоминание может прийти заново
                 if (!date.equals(editing.next) || editing.remindDays != remindValue()) {
                     prefs.forgetNotified(editing.id);

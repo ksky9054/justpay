@@ -27,6 +27,7 @@ public final class Prefs {
     private static final String K_STREAK_CHECKED = "streak_checked";
     private static final String K_IDLE_CHECKED = "idle_checked";
     private static final String K_IDLE_SENT = "idle_sent";
+    private static final String K_MONTHLY_BUDGET = "monthly_budget";
 
     private final SharedPreferences sp;
 
@@ -77,6 +78,16 @@ public final class Prefs {
 
     public void setNotified(Set<String> keys) {
         sp.edit().putStringSet(k(K_NOTIFIED), new HashSet<>(keys)).apply();
+    }
+
+    /** Лимит расходов на подписки в валюте текущего аккаунта; 0 означает, что лимит не задан. */
+    public double monthlyBudget() {
+        return Double.longBitsToDouble(sp.getLong(k(K_MONTHLY_BUDGET), 0L));
+    }
+
+    public void setMonthlyBudget(double value) {
+        sp.edit().putLong(k(K_MONTHLY_BUDGET),
+                Double.doubleToRawLongBits(Math.max(0d, value))).apply();
     }
 
     /** Вечернее напоминание о серии */

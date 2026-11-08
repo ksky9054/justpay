@@ -30,7 +30,7 @@ public class DetailActivity extends BaseActivity {
         setContentView(R.layout.activity_detail);
         Ui.fitSystemBars(findViewById(R.id.root));
         interceptBack();
-        id =getIntent().getLongExtra(EXTRA_ID, 0);
+        id = getIntent().getLongExtra(EXTRA_ID, 0);
 
         pill = findViewById(R.id.pill_status);
         name = findViewById(R.id.d_name);
@@ -117,12 +117,13 @@ public class DetailActivity extends BaseActivity {
 
         // Три последних списания
         history.removeAllViews();
-        LocalDate base = s.next != null ? s.next : (s.prev != null ? s.prev : today);
+        LocalDate base = s.prev;
         LayoutInflater inflater = LayoutInflater.from(this);
         int count = 0;
-        for (int k = 1; count < 3 && k < 40; k++) {
-            LocalDate t = Subscription.shift(base, s.cycle, -k);
-            if (!t.isBefore(today)) continue;
+        int anchor = base != null ? Math.max(base.getDayOfMonth(), s.next != null ? s.next.getDayOfMonth() : 0) : 0;
+        for (int k = 0; base != null && count < 3 && k < 40; k++) {
+            LocalDate t = Subscription.shift(base, s.cycle, -k, anchor);
+            if (t.isAfter(today)) continue;
             // Раньше создания подписки списаний не было
             if (t.isBefore(s.createdAt)) break;
             View row = inflater.inflate(R.layout.item_history, history, false);
@@ -179,15 +180,16 @@ public class DetailActivity extends BaseActivity {
             }, "Меняется только статус в JustPay. Автоплатёж отключайте в самом сервисе.",
                     "Приостановить", false, () -> {
                         s.status = Subscription.PAUSED;
-                        s.prev = s.next;
-                        s.next = null;
+                        // Сохраняем s.prev и s.next для точного возобновления и истории списаний
+
                         repo.update(s);
                         bind();
                         Toaster.show(this, "«" + s.name + "» на паузе - экономия " + Fmt.money(month) + " в месяц");
                     });
         } else {
-            LocalDate base = s.prev != null ? s.prev : today();
-            LocalDate resume = Subscription.advance(base, s.cycle, today(), false);
+            LocalDate base = s.next != null ? s.next : (s.prev != null ? s.prev : today());
+            int anchor = s.next != null ? s.next.getDayOfMonth() : (s.prev != null ? s.prev.getDayOfMonth() : today().getDayOfMonth());
+            LocalDate resume = Subscription.advance(base, s.cycle, today(), true, anchor);
             ConfirmSheet.show(this, "Возобновить «" + s.name + "»?", R.layout.sheet_body_confirm, body -> {
                 ((TextView) body.findViewById(R.id.b_title)).setText("Добавится к расходам");
                 TextView monthTv = body.findViewById(R.id.b_month);

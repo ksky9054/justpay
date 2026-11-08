@@ -4,11 +4,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import java.time.LocalDate;
+
+import ru.eridian.justpay.data.SubscriptionRepository;
+
 /** Принимает сигнал будильника, показывает уведомление и ставит следующий */
 public class ReminderReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        SubscriptionRepository.get(context).rollForward(LocalDate.now(), false);
         if (ReminderScheduler.ACTION_REMIND.equals(action)) {
             ReminderScheduler.notifyDue(context);
         } else if (ActivityReminders.ACTION_STREAK.equals(action)) {

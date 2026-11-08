@@ -71,41 +71,62 @@ final class CalendarTab {
         });
     }
 
-    void refresh() {
-        LocalDate today = LocalDate.now();
-        LocalDate first = today.withDayOfMonth(1).plusMonths(monthOffset);
+    /** Рассчитывает дни платежей для месяца first */
+    static Map<Integer, List<Subscription>> computeOccurrences(List<Subscription> subs, LocalDate first, LocalDate today) {
         int y = first.getYear(), m = first.getMonthValue(), dim = first.lengthOfMonth();
-
         Map<Integer, List<Subscription>> occ = new HashMap<>();
-        for (Subscription s : a.repo.all()) {
-            if (!s.isActive() || s.next == null) continue;
+        if (subs == null) return occ;
+
+        for (Subscription s : subs) {
+            if (s == null || !s.isActive() || s.next == null) continue;
             LocalDate nd = s.next;
+            int anchor = Math.max(nd.getDayOfMonth(), s.prev != null ? s.prev.getDayOfMonth() : 0);
             if (Subscription.CYCLE_MONTH.equals(s.cycle)) {
-                int day = Math.min(nd.getDayOfMonth(), dim);
+                int day = Math.min(anchor, dim);
                 LocalDate dt = LocalDate.of(y, m, day);
-                // В будущем месяце до ближайшего списания ещё не списывали
-                if (!(!dt.isBefore(today) && dt.isBefore(nd))) add(occ, day, s);
+                // Предстоящие списания и подтверждённые фактические платежи в прошлом
+                if (isOccurrence(dt, nd, s, today)) {
+                    add(occ, day, s);
+                }
             } else if (Subscription.CYCLE_YEAR.equals(s.cycle)) {
-                if (nd.getMonthValue() == m && nd.getYear() == y) add(occ, nd.getDayOfMonth(), s);
+                if (nd.getMonthValue() == m) {
+                    int day = Math.min(anchor, dim);
+                    LocalDate dt = LocalDate.of(y, m, day);
+                    if (isOccurrence(dt, nd, s, today)) {
+                        add(occ, day, s);
+                    }
+                }
             } else {
+                // Еженедельная подписка: выравниваем дату t на первое появление в месяце first
                 LocalDate t = nd;
-                while (!t.isBefore(first)) t = t.minusDays(7);
-                t = t.plusDays(7);
+                while (t.isAfter(first)) t = t.minusDays(7);
+                while (t.isBefore(first)) t = t.plusDays(7);
                 while (t.getMonthValue() == m && t.getYear() == y) {
-                    if (!t.isBefore(nd) || t.isBefore(today)) add(occ, t.getDayOfMonth(), s);
+                    if (isOccurrence(t, nd, s, today)) {
+                        add(occ, t.getDayOfMonth(), s);
+                    }
                     t = t.plusDays(7);
                 }
             }
         }
+        return occ;
+    }
+
+    void refresh() {
+        LocalDate today = LocalDate.now();
+        LocalDate first = today.withDayOfMonth(1).plusMonths(monthOffset);
+        int y = first.getYear(), m = first.getMonthValue();
+
+        Map<Integer, List<Subscription>> occ = computeOccurrences(a.repo.all(), first, today);
 
         // Выбран сохранённый день, иначе ближайший с платежом
         List<Integer> days = new ArrayList<>(occ.keySet());
         java.util.Collections.sort(days);
         int sel;
         if (selectedMonthOffset == monthOffset && selectedDay > 0) {
-            sel = selectedDay;
+            sel = Math.min(selectedDay, first.lengthOfMonth());
         } else {
-            sel = days.isEmpty() ? 1 : days.get(0);
+            sel = days.isEmpty() ? (monthOffset == 0 ? today.getDayOfMonth() : 1) : days.get(0);
             for (int d : days) {
                 if (!LocalDate.of(y, m, d).isBefore(today)) {
                     sel = d;
@@ -153,6 +174,12 @@ final class CalendarTab {
             }
         }
         empty.setVisibility(items == null || items.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private static boolean isOccurrence(LocalDate dt, LocalDate nd, Subscription s, LocalDate today) {
+        if (dt.isBefore(s.createdAt)) return false;
+        if (!dt.isBefore(nd)) return true;
+        return s.prev != null && !dt.isAfter(s.prev) && dt.isBefore(today);
     }
 
     private static void add(Map<Integer, List<Subscription>> occ, int day, Subscription s) {

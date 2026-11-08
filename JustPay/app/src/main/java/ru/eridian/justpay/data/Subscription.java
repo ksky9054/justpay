@@ -70,18 +70,40 @@ public class Subscription {
 
     /** Сдвигает дату на k периодов */
     public static LocalDate shift(LocalDate base, String cycle, int k) {
-        if (CYCLE_YEAR.equals(cycle)) return base.plusYears(k);
+        return shift(base, cycle, k, base != null ? base.getDayOfMonth() : 0);
+    }
+
+    /** Сдвигает дату на k периодов с сохранением желаемого дня месяца (например, 31 числа) */
+    public static LocalDate shift(LocalDate base, String cycle, int k, int anchorDay) {
+        if (CYCLE_YEAR.equals(cycle)) {
+            LocalDate target = base.plusYears(k);
+            if (anchorDay > 0) {
+                int dim = target.lengthOfMonth();
+                return target.withDayOfMonth(Math.min(anchorDay, dim));
+            }
+            return target;
+        }
         if (CYCLE_WEEK.equals(cycle)) return base.plusWeeks(k);
-        return base.plusMonths(k);
+        LocalDate target = base.plusMonths(k);
+        if (anchorDay > 0) {
+            int dim = target.lengthOfMonth();
+            return target.withDayOfMonth(Math.min(anchorDay, dim));
+        }
+        return target;
     }
 
     /** Первая дата списания после today (с inclusive и сама today) */
     public static LocalDate advance(LocalDate base, String cycle, LocalDate today, boolean inclusive) {
+        return advance(base, cycle, today, inclusive, base != null ? base.getDayOfMonth() : 0);
+    }
+
+    /** Первая дата списания после today с сохранением желаемого дня месяца (например, 31 числа) */
+    public static LocalDate advance(LocalDate base, String cycle, LocalDate today, boolean inclusive, int anchorDay) {
         LocalDate d = base;
         int k = 0;
         while (inclusive ? d.isBefore(today) : !d.isAfter(today)) {
             k++;
-            d = shift(base, cycle, k);
+            d = shift(base, cycle, k, anchorDay);
             if (k > 5000) break;
         }
         return d;

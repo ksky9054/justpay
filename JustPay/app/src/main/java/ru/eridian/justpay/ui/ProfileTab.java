@@ -29,6 +29,7 @@ import ru.eridian.justpay.reminder.ReminderScheduler;
 import ru.eridian.justpay.usage.UsageAccess;
 import ru.eridian.justpay.util.AvatarPhoto;
 import ru.eridian.justpay.util.Fmt;
+import ru.eridian.justpay.util.SubscriptionCsvExporter;
 
 /** Вкладка «Профиль» */
 final class ProfileTab {
@@ -102,11 +103,48 @@ final class ProfileTab {
         screen.findViewById(R.id.row_doc_terms).setOnClickListener(v -> LegalActivity.open(a, LegalActivity.TERMS));
         screen.findViewById(R.id.row_doc_privacy).setOnClickListener(v -> LegalActivity.open(a, LegalActivity.PRIVACY));
         screen.findViewById(R.id.row_doc_consent).setOnClickListener(v -> LegalActivity.open(a, LegalActivity.CONSENT));
+        screen.findViewById(R.id.row_export).setOnClickListener(v -> exportSubscriptions());
         screen.findViewById(R.id.row_onboarding).setOnClickListener(v ->
                 a.startActivity(new Intent(a, OnboardingActivity.class)
                         .putExtra(OnboardingActivity.EXTRA_REPLAY, true)));
         screen.findViewById(R.id.row_logout).setOnClickListener(v -> signOut());
         screen.findViewById(R.id.row_delete).setOnClickListener(v -> confirmDelete());
+    }
+
+    /** Открывает системный диалог выбора места сохранения CSV-файла. */
+    private void exportSubscriptions() {
+        List<Subscription> subscriptions = a.repo.all();
+        if (subscriptions.isEmpty()) {
+            Toaster.show(a, "Пока нечего экспортировать");
+            return;
+        }
+        String fileName = "justpay-subscriptions-" + java.time.LocalDate.now() + ".csv";
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("text/csv")
+                .putExtra(Intent.EXTRA_TITLE, fileName);
+        try {
+            a.startActivityForResult(intent, MainActivity.REQ_EXPORT);
+        } catch (ActivityNotFoundException e) {
+            Toaster.show(a, "Не удалось открыть окно сохранения файла");
+        }
+    }
+
+    /** Записывает CSV в документ, выбранный пользователем в системном окне. */
+    void onExportPicked(Uri uri) {
+        if (uri == null) return;
+        List<Subscription> subscriptions = a.repo.all();
+        Account account = AccountRepository.get(a).find(a.prefs.accountId());
+        Currency currency = account == null ? Currency.RUB : account.currencyValue();
+        String csv = SubscriptionCsvExporter.build(subscriptions, currency);
+        try (java.io.OutputStream output = a.getContentResolver().openOutputStream(uri, "wt")) {
+            if (output == null) throw new java.io.IOException("Не удалось открыть файл");
+            output.write(csv.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            output.flush();
+            Toaster.show(a, "Экспортировано подписок: " + subscriptions.size());
+        } catch (java.io.IOException | SecurityException e) {
+            Toaster.show(a, "Не удалось сохранить CSV-файл");
+        }
     }
 
     private void openAvatar() {
@@ -215,7 +253,14 @@ final class ProfileTab {
     }
 
     private void applyCurrency(Account acc, Currency to, double factor, String message) {
+        double budget = a.prefs.monthlyBudget();
+
         AccountRepository.get(a).changeCurrency(acc.id, to, factor);
+
+        if (budget > 0d && factor != 1.0) {
+            a.prefs.setMonthlyBudget(budget * factor);
+        }
+
         Fmt.setCurrency(to);
         a.refreshAll();
         Toaster.show(a, message);
