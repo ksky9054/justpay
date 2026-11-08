@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M .428 9.572 v 4.899 h 23.144 V 9.572 Z m 1.543 1.143 h .172 l .886 .014 v .572 h -.744 v 1.484 h .744 v .572 H 1.971 l -.371 -.37 v -1.901 z m 1.7 0 h 1.243 l .47 .314 v .985 l -.37 .244 .601 1.086 h -.73 l -.528 -.973 v .973 h -.685 Z m 2.815 0 H 7.5 l .357 .314 v 2.315 h -.615 v -.873 h -.484 v .873 h -.63 v -2.315 z m 2.07 0 h 1.329 v .613 H 9.27 v .516 h .543 v .57 h -.543 v .93 h -.714 Z m 1.944 0 h 1.686 l -.2 .629 h -.443 v 2 h -.672 v -2 h -.57 z m 2.1 0 h 1.556 l -.17 .613 h -.843 l 1.029 1.414 -.201 .615 h -1.713 l .185 -.586 h .942 l -.942 -1.386 z m 2.1 0 h .814 l .414 .97 .4 -.97 h .815 v 2.613 h -.672 v -1.57 l -.399 .957 h -.3 l -.4 -.944 v 1.573 h -.673 z m 3.571 0 h 1.014 l .358 .314 v 2.315 h -.63 v -.873 h -.484 v .873 h -.615 v -2.315 z m 2.057 0 h .629 l .615 1.414 v -1.414 h .627 v 2.629 h -.627 l -.615 -1.416 v 1.416 h -.629 z m -13.586 .556 v .614 h .487 v -.614 z m 11.787 0 v .614 h .485 v -.614 z m -14.172 .014 v .572 h .358 v -.572 Z M 0 9.143 h 24 v 5.714 H 0 Z" />
+</vector>

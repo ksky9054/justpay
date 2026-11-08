@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 8.16 13.92 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 H 12 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 v .48 h .48 V 24 H 2.4 v -.48 h -.48 v -.48 h -.48 v -.48 H .96 v -.48 H .48 v -.48 H 0 v -.96 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .96 Z m -.96 6.72 h .48 v .48 h .48 v .48 h .48 v -.96 h -.48 v -.48 h -.48 v -.48 H 7.2 Z m 0 -2.88 H 5.76 v .48 h .48 v .48 h 1.92 V 16.8 h -.48 v -.48 H 7.2 Z M 24 7.68 h -.48 V 9.6 h -.48 v .48 h -.48 v .48 h -.48 v .48 h -.96 v .48 h -.48 V 12 h -.48 v .48 h -.48 v .48 h -.96 v 4.32 h 2.4 v .48 h .48 v 4.32 h -.48 v .48 h -.48 v .96 h -.48 V 24 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -2.4 h -.48 v .48 h -1.44 v .48 h -.48 v 1.44 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.48 H 12 v -.48 h -.48 v -.96 H 12 v -.96 h .48 v -.48 h -.96 v .48 H 9.6 v -.48 h -.48 v -.48 h -.48 v -.48 h -.48 v -.96 h .48 v -.48 h .48 v -.48 h .96 v -.48 h 3.36 V 9.6 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 V 7.2 h 1.92 v -.48 h 1.44 v -.48 H 24 Z m -8.16 .96 h -.48 v .96 h .48 v .48 h .96 V 9.6 h .48 v -.96 h -.48 v -.48 h -.96 Z M 13.92 .48 h .48 V 4.8 h .48 v .48 h .48 v .96 h .48 v .96 h -.48 v .48 h -.48 v .48 h -.48 v .48 h -.48 v .48 h -.48 v .48 H 12 v -.48 h -.48 v -.48 h -.96 v -.48 h -.48 v -.48 H 9.6 V 7.2 H 6.72 v -.48 h -.48 v -2.4 h .48 v -.48 h .48 v -.48 h .48 v -.48 h .48 V 2.4 h .48 v -.48 h .48 v -.48 h .48 V .96 h .48 V .48 h .96 V 0 h 2.88 z" />
+</vector>

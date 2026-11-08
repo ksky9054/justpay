@@ -199,6 +199,7 @@ final class HomeTab {
         TextView cyc = item.findViewById(R.id.cyc);
 
         name.setText(s.name);
+        ((BrandIconView) item.findViewById(R.id.icon)).setName(s.name);
         price.setText(Fmt.price(s.price));
         cyc.setText("в " + Fmt.cycleShort(s.cycle));
 
