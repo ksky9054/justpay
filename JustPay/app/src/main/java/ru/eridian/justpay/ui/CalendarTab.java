@@ -142,6 +142,7 @@ final class CalendarTab {
                 View row = inflater.inflate(R.layout.item_sub_row, list, false);
                 row.findViewById(R.id.divider).setVisibility(i == 0 ? View.GONE : View.VISIBLE);
                 ((TextView) row.findViewById(R.id.name)).setText(s.name);
+                ((BrandIconView) row.findViewById(R.id.icon)).setName(s.name);
                 ((TextView) row.findViewById(R.id.price)).setText(Fmt.price(s.price));
                 View cyc = row.findViewById(R.id.cyc);
                 if (cyc != null) cyc.setVisibility(View.GONE);

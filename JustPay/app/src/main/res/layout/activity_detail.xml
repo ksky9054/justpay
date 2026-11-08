@@ -68,6 +68,12 @@
             android:paddingTop="12dp"
             android:paddingEnd="20dp">
 
+            <ru.eridian.justpay.ui.BrandIconView
+                android:id="@+id/d_icon"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="6dp" />
+
             <TextView
                 android:id="@+id/d_name"
                 style="@style/Jp.Bold"

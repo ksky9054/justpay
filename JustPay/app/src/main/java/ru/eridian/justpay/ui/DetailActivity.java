@@ -84,6 +84,7 @@ public class DetailActivity extends BaseActivity {
         pill.setText(active ? "Активна" : "На паузе");
 
         name.setText(s.name);
+        ((BrandIconView) findViewById(R.id.d_icon)).setName(s.name);
         cat.setText(s.category + " - с " + s.since);
         price.setText(Fmt.price(s.price));
         cyc.setText("/ " + Fmt.cycleShort(s.cycle));
